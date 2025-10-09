@@ -16,6 +16,12 @@ export type Vehicle = {
   tires: Tire[];
 };
 
+export type Driver = {
+  id: string;
+  name: string;
+  cnh: string;
+};
+
 export type MaintenanceReport = {
   id: string;
   date: string;

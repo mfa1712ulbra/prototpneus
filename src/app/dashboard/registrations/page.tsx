@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Truck, User, Cog } from "lucide-react";
 import Link from "next/link";
 
@@ -7,19 +7,19 @@ const registrationItems = [
     title: "Veículos",
     description: "Cadastre e gerencie seus veículos",
     icon: Truck,
-    href: "#",
+    href: "/dashboard/registrations/vehicles",
   },
   {
     title: "Motoristas",
     description: "Adicione e edite informações dos motoristas",
     icon: User,
-    href: "#",
+    href: "/dashboard/registrations/drivers",
   },
   {
     title: "Tipos de Pneu",
     description: "Gerencie os modelos e marcas de pneus",
     icon: Cog,
-    href: "#",
+    href: "/dashboard/registrations/tires",
   },
 ];
 
