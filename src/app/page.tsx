@@ -20,9 +20,9 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+    <main className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm">
-        <Card className="shadow-2xl">
+        <Card className="border-none shadow-none">
           <CardHeader className="items-center text-center">
             {logoImage && (
               <Image
@@ -48,6 +48,7 @@ export default function LoginPage() {
                   placeholder="seu.usuario"
                   defaultValue="tecnico"
                   required
+                  className="bg-gray-100"
                 />
               </div>
               <div className="space-y-2">
@@ -58,6 +59,7 @@ export default function LoginPage() {
                   placeholder="••••••••"
                   defaultValue="123456"
                   required
+                  className="bg-gray-100"
                 />
               </div>
               <Button type="submit" className="w-full font-bold">
