@@ -53,7 +53,7 @@ export function AppHeader() {
         </DropdownMenu>
       </div>
       
-      <h1 className="font-headline text-xl font-bold">TireControl</h1>
+      <h1 className="font-headline text-xl font-bold">PrototPneus</h1>
       
       <div className="w-10">
         {!isDashboardHome && (

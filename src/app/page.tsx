@@ -35,7 +35,7 @@ export default function LoginPage() {
               />
             )}
             <CardTitle className="font-headline text-3xl font-bold text-[#008080]">
-              TireControl
+              PrototPneus
             </CardTitle>
           </CardHeader>
           <CardContent>
