@@ -36,6 +36,11 @@ export default function VehicleRegistrationPage() {
   const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      plate: "",
+      model: undefined,
+    },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {

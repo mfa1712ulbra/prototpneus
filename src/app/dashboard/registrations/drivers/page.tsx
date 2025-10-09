@@ -26,6 +26,10 @@ export default function DriverRegistrationPage() {
   const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      cnh: "",
+    },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {

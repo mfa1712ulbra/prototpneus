@@ -26,6 +26,10 @@ export default function TireTypeRegistrationPage() {
   const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      brand: "",
+      model: "",
+    },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
