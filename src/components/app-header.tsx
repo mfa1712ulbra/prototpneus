@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import { ArrowLeft, User, LogOut, HelpCircle } from "lucide-react";
+import { ArrowLeft, User, LogOut, HelpCircle, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -38,6 +38,10 @@ export function AppHeader() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+           <DropdownMenuItem onClick={() => router.push('/dashboard/registrations')}>
+            <Wrench className="mr-2 h-4 w-4" />
+            <span>Cadastros</span>
+          </DropdownMenuItem>
           <DropdownMenuItem>
             <HelpCircle className="mr-2 h-4 w-4" />
             <span>Ajuda</span>
