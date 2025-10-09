@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import { ArrowLeft, LogOut, HelpCircle, Wrench, Menu } from "lucide-react";
+import { ArrowLeft, LogOut, HelpCircle, Wrench, Menu, Truck, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -28,9 +28,17 @@ export function AppHeader() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
+             <DropdownMenuItem onClick={() => router.push('/dashboard')}>
+              <Truck className="mr-2 h-4 w-4" />
+              <span>Veículos</span>
+            </DropdownMenuItem>
              <DropdownMenuItem onClick={() => router.push('/dashboard/registrations')}>
               <Wrench className="mr-2 h-4 w-4" />
               <span>Cadastros</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push('/dashboard/reports')}>
+              <FileText className="mr-2 h-4 w-4" />
+              <span>Relatórios</span>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <HelpCircle className="mr-2 h-4 w-4" />
