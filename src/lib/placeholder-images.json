@@ -1,3 +1,10 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "logo",
+      "description": "TireControl logo placeholder",
+      "imageUrl": "https://picsum.photos/seed/tirecontrol-logo/100/100",
+      "imageHint": "logo abstract"
+    }
+  ]
 }

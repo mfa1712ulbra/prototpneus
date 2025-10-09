@@ -1,3 +1,73 @@
-export default function Home() {
-  return <></>;
+"use client";
+
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { ArrowRight } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
+
+export default function LoginPage() {
+  const router = useRouter();
+  const logoImage = PlaceHolderImages.find((img) => img.id === "logo");
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    router.push("/dashboard");
+  };
+
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+      <div className="w-full max-w-sm">
+        <Card className="shadow-2xl">
+          <CardHeader className="items-center text-center">
+            {logoImage && (
+              <Image
+                src={logoImage.imageUrl}
+                alt={logoImage.description}
+                width={80}
+                height={80}
+                className="rounded-full"
+                data-ai-hint={logoImage.imageHint}
+              />
+            )}
+            <CardTitle className="font-headline text-3xl font-bold text-[#008080]">
+              TireControl
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="username">Usuário</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="seu.usuario"
+                  defaultValue="tecnico"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Senha</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  defaultValue="123456"
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full font-bold">
+                Entrar
+                <ArrowRight className="ml-2" />
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </main>
+  );
 }
