@@ -145,6 +145,7 @@ export function TireInfoSheet({ tire, isOpen, onOpenChange, onSave }: TireInfoSh
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="none">Nenhuma ação</SelectItem>
+                          <SelectItem value="inspection">Inspeção</SelectItem>
                           <SelectItem value="rotation">Rotação</SelectItem>
                           <SelectItem value="retread">Recapagem</SelectItem>
                           <SelectItem value="storage">Armazenar</SelectItem>

@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { vehicles } from "@/lib/data";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Plus, Truck } from "lucide-react";
+import { Truck } from "lucide-react";
 
 export default function DashboardPage() {
   return (
@@ -13,9 +12,9 @@ export default function DashboardPage() {
           <Link
             href={`/dashboard/vehicles/${vehicle.id}`}
             key={vehicle.id}
-            className="block"
+            className="block transform transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]"
           >
-            <Card className="transform transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]">
+            <Card>
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div>
@@ -37,12 +36,6 @@ export default function DashboardPage() {
           </Link>
         ))}
       </div>
-      <Button
-        className="fixed bottom-20 right-4 z-20 h-14 w-14 rounded-full shadow-xl"
-        aria-label="Adicionar novo veículo"
-      >
-        <Plus className="h-7 w-7" />
-      </Button>
     </div>
   );
 }
