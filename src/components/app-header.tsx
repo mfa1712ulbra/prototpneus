@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import { ArrowLeft, User, LogOut, HelpCircle, Wrench } from "lucide-react";
+import { ArrowLeft, LogOut, HelpCircle, Wrench, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -33,7 +33,7 @@ export function AppHeader() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 hover:text-white">
-            <User className="h-6 w-6" />
+            <Menu className="h-6 w-6" />
             <span className="sr-only">Menu do usuário</span>
           </Button>
         </DropdownMenuTrigger>
