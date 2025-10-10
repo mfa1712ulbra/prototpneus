@@ -61,7 +61,7 @@ export default function LoginPage() {
         </Card>
       </div>
       <div className="absolute bottom-4 text-sm text-muted-foreground">
-        Versão 1.0
+        Versão 1.00
       </div>
     </main>
   );
