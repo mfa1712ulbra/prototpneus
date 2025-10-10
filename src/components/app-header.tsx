@@ -32,7 +32,7 @@ export function AppHeader() {
               <Truck className="mr-2 h-4 w-4" />
               <span>Veículos</span>
             </DropdownMenuItem>
-             <DropdownMenuItem onClick={() => router.push('/dashboard/registrations')}>-
+             <DropdownMenuItem onClick={() => router.push('/dashboard/registrations')}>
               <Wrench className="mr-2 h-4 w-4" />
               <span>Cadastros</span>
             </DropdownMenuItem>
@@ -45,7 +45,7 @@ export function AppHeader() {
               <span>Ajuda</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push('/')}>
+            <DropdownMenuItem onClick={() => router.replace('/')}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Sair</span>
             </DropdownMenuItem>
