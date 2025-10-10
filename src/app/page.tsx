@@ -20,7 +20,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background p-4">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm">
         <Card className="border-none shadow-none">
           <CardHeader className="items-center text-center">
@@ -69,6 +69,9 @@ export default function LoginPage() {
             </form>
           </CardContent>
         </Card>
+      </div>
+      <div className="absolute bottom-4 text-sm text-muted-foreground">
+        Versão 1.0
       </div>
     </main>
   );
