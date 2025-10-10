@@ -1,18 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Truck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export default function LoginPage() {
   const router = useRouter();
-  const logoImage = PlaceHolderImages.find((img) => img.id === "logo");
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,16 +21,9 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <Card className="border-none shadow-none">
           <CardHeader className="items-center text-center">
-            {logoImage && (
-              <Image
-                src={logoImage.imageUrl}
-                alt={logoImage.description}
-                width={80}
-                height={80}
-                className="rounded-full"
-                data-ai-hint={logoImage.imageHint}
-              />
-            )}
+            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Truck className="h-10 w-10" />
+            </div>
             <CardTitle className="font-headline text-3xl font-bold text-[#008080]">
               PrototPneus
             </CardTitle>
