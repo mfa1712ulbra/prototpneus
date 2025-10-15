@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Vehicle, Tire } from "@/lib/data";
-import { TireInfoSheet } from "./tire-info-sheet";
+import { TireInfoDialog } from "./tire-info-dialog";
 import { cn } from "@/lib/utils";
 
 type VehicleDiagramProps = {
@@ -72,7 +72,7 @@ export function VehicleDiagram({ vehicle }: VehicleDiagramProps) {
         ))}
       </div>
       {selectedTire && (
-        <TireInfoSheet
+        <TireInfoDialog
           tire={selectedTire}
           isOpen={!!selectedTire}
           onOpenChange={(open) => {
