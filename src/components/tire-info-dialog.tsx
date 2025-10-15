@@ -32,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   pressure: z.coerce.number().min(1, "Pressão é obrigatória"),
@@ -70,7 +71,8 @@ export function TireInfoDialog({ tire, isOpen, onOpenChange, onSave }: TireInfoD
         movement: "none",
       });
     }
-  }, [tire, form]);
+    setIsSuccess(false);
+  }, [tire, isOpen, form]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const updatedTire = { ...tire, ...values };
@@ -84,7 +86,12 @@ export function TireInfoDialog({ tire, isOpen, onOpenChange, onSave }: TireInfoD
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent 
+        className={cn(
+            "top-0 translate-y-0 sm:top-[5vh] sm:rounded-lg",
+            "data-[state=closed]:slide-out-to-top-full data-[state=open]:slide-in-from-top-full"
+        )}
+      >
         {isSuccess ? (
           <div className="flex h-full flex-col items-center justify-center gap-4 text-center p-8">
             <CheckCircle className="h-16 w-16 text-green-500" />
