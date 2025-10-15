@@ -5,3 +5,6 @@ runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
   maxInstances: 1
+
+buildConfig:
+  timeout: 600s # Tempo limite de 10 minutos para o processo de build
