@@ -88,7 +88,7 @@ export function TireInfoDialog({ tire, isOpen, onOpenChange, onSave }: TireInfoD
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent 
         className={cn(
-            "top-0 translate-y-0 sm:top-[5vh] sm:rounded-lg",
+            "top-0 translate-y-0 sm:top-[5vh] sm:rounded-lg p-4",
             "data-[state=closed]:slide-out-to-top-full data-[state=open]:slide-in-from-top-full"
         )}
       >
@@ -101,15 +101,15 @@ export function TireInfoDialog({ tire, isOpen, onOpenChange, onSave }: TireInfoD
         ) : (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="flex h-full flex-col">
-              <DialogHeader className="text-left">
-                <DialogTitle className="font-headline text-2xl">Pneu Posição {tire.position}</DialogTitle>
+              <DialogHeader className="text-left space-y-1">
+                <DialogTitle className="font-headline text-xl">Pneu Posição {tire.position}</DialogTitle>
                 <DialogDescription>
                   Última checagem: {new Date(tire.lastCheck).toLocaleDateString("pt-BR")}
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="space-y-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-3 py-3">
+                <div className="grid grid-cols-2 gap-3">
                   <FormField
                     control={form.control}
                     name="pressure"
@@ -119,7 +119,7 @@ export function TireInfoDialog({ tire, isOpen, onOpenChange, onSave }: TireInfoD
                         <FormControl>
                           <Input type="number" placeholder="120" {...field} />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-xs" />
                       </FormItem>
                     )}
                   />
@@ -132,7 +132,7 @@ export function TireInfoDialog({ tire, isOpen, onOpenChange, onSave }: TireInfoD
                         <FormControl>
                           <Input type="number" placeholder="8" {...field} />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-xs" />
                       </FormItem>
                     )}
                   />
@@ -144,9 +144,9 @@ export function TireInfoDialog({ tire, isOpen, onOpenChange, onSave }: TireInfoD
                     <FormItem>
                       <FormLabel>Observações</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Desgaste irregular, etc." {...field} />
+                        <Textarea placeholder="Desgaste irregular, etc." className="min-h-[60px]" {...field} />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-xs" />
                     </FormItem>
                   )}
                 />
@@ -172,13 +172,13 @@ export function TireInfoDialog({ tire, isOpen, onOpenChange, onSave }: TireInfoD
                           <SelectItem value="discard">Descarte</SelectItem>
                         </SelectContent>
                       </Select>
-                      <FormMessage />
+                      <FormMessage className="text-xs" />
                     </FormItem>
                   )}
                 />
               </div>
 
-              <DialogFooter className="grid grid-cols-2 gap-2 pt-4">
+              <DialogFooter className="grid grid-cols-2 gap-2 pt-2">
                 <Button variant="outline" type="button" onClick={() => onOpenChange(false)}>
                   <X className="mr-2 h-4 w-4" />
                   Cancelar
