@@ -72,7 +72,7 @@ export function TireInfoSheet({ tire, isOpen, onOpenChange, onSave }: TireInfoSh
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="mx-auto max-w-sm rounded-t-lg p-4">
+      <SheetContent side="right" className="p-4">
         {isSuccess ? (
           <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
             <CheckCircle className="h-16 w-16 text-green-500" />
