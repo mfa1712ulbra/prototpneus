@@ -1,0 +1,17 @@
+# The name of your backend.
+# The name of your backend can contain only lowercase letters and numbers.
+# The same name will be used to create your Cloud Run service.
+backendId: prototpneus-backend
+
+# The location of your backend.
+# The location of your backend can be any of the following:
+# https://firebase.google.com/docs/hosting/app-hosting-locations
+location: us-central1
+
+# The configuration for your Cloud Run service.
+# The following are the minimum required fields.
+# For a full list of options, see:
+# https://firebase.google.com/docs/hosting/app-hosting-options#runconfig
+runConfig:
+  # The maximum number of container instances that can be running at the same time.
+  maxInstances: 1
