@@ -13,5 +13,4 @@ location: us-central1
 # For a full list of options, see:
 # https://firebase.google.com/docs/hosting/app-hosting-options#runconfig
 runConfig:
-  # The maximum number of container instances that can be running at the same time.
   maxInstances: 1
