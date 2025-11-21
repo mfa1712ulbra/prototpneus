@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -23,11 +24,21 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Save } from "lucide-react";
+import { Save, Truck } from "lucide-react";
+import { listaVeiculos as veiculosIniciais, type Veiculo } from "@/lib/tipos";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
 
 const schemaFormulario = z.object({
   nome: z.string().min(2, "O nome do veículo é obrigatório."),
-  placa: z.string().min(7, "A placa deve ter 7 caracteres.").max(7),
+  placa: z.string().min(7, "A placa deve ter 7 caracteres.").max(7, "A placa deve ter 7 caracteres."),
   modelo: z.string({
     required_error: "Selecione o modelo do veículo.",
   }),
@@ -35,6 +46,8 @@ const schemaFormulario = z.object({
 
 export default function PaginaCadastroVeiculo() {
   const { toast } = useToast();
+  const [listaDeVeiculos, setListaDeVeiculos] = useState<Veiculo[]>(veiculosIniciais);
+
   const form = useForm<z.infer<typeof schemaFormulario>>({
     resolver: zodResolver(schemaFormulario),
     defaultValues: {
@@ -45,22 +58,26 @@ export default function PaginaCadastroVeiculo() {
   });
 
   function aoSubmeter(valores: z.infer<typeof schemaFormulario>) {
-    console.log(valores);
+    const novoVeiculo: Veiculo = {
+        id: new Date().getTime().toString(),
+        ...valores,
+        pneus: [], // Um novo veículo começa sem pneus detalhados
+    }
+
+    setListaDeVeiculos(veiculosAtuais => [novoVeiculo, ...veiculosAtuais]);
+
     toast({
       title: "Sucesso!",
       description: "Veículo cadastrado com sucesso.",
     });
-    form.reset({ nome: "", placa: "", modelo: "" });
+    form.reset({ nome: "", placa: "", modelo: undefined });
   }
 
   return (
-    <div className="space-y-4">
-      <h2 className="font-headline text-2xl font-semibold text-gray-800">
-        Cadastrar Veículo
-      </h2>
+    <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Informações do Veículo</CardTitle>
+          <CardTitle>Cadastrar Novo Veículo</CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -97,7 +114,7 @@ export default function PaginaCadastroVeiculo() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Modelo</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value} defaultValue="">
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione o modelo" />
@@ -121,6 +138,38 @@ export default function PaginaCadastroVeiculo() {
           </Form>
         </CardContent>
       </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Truck className="h-5 w-5" />
+            Veículos Cadastrados
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Placa</TableHead>
+                  <TableHead>Modelo</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {listaDeVeiculos.map((veiculo) => (
+                  <TableRow key={veiculo.id}>
+                    <TableCell className="font-medium">{veiculo.nome}</TableCell>
+                    <TableCell>{veiculo.placa}</TableCell>
+                    <TableCell>{veiculo.modelo}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+
     </div>
   );
 }
