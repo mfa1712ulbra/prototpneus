@@ -1,5 +1,5 @@
 /**
- * @fileOverview Firestore Security Rules for the TireControl application.
+ * @fileOverview Firestore Security Rules for the PrototPneus application.
  *
  * Core Philosophy:
  * This ruleset enforces a strict user-ownership model for all data. Each user has complete control over their own data (vehicles, tires, and movements), while preventing access to other users' data.

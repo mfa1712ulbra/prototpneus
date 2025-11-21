@@ -26,7 +26,7 @@ export default function PaginaLogin() {
               <Truck className="h-10 w-10" />
             </div>
             <CardTitle className="font-headline text-3xl font-bold text-primary">
-              TireControl
+              PrototPneus
             </CardTitle>
             <CardDescription className="text-muted-foreground">
               Gerencie os pneus da sua frota com facilidade.

@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "TireControl",
+  title: "PrototPneus",
   description: "Gerencie os pneus da sua frota com facilidade.",
 };
 
