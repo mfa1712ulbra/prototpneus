@@ -51,8 +51,15 @@ export async function excluirVeiculo(usuarioId: string, veiculoId: string) {
     throw new Error('IDs são necessários para excluir um veículo.');
   }
 
-  // Você pode querer adicionar lógica para excluir subcoleções aqui (ex: pneus)
+  const pneusSnapshot = await db.collection(`usuarios/${usuarioId}/veiculos/${veiculoId}/pneus`).get();
+  const batch = db.batch();
+  pneusSnapshot.docs.forEach(doc => {
+    batch.delete(doc.ref);
+  });
+  await batch.commit();
+
   await db.doc(`usuarios/${usuarioId}/veiculos/${veiculoId}`).delete();
 
   revalidatePath('/dashboard/registrations/vehicles');
+  revalidatePath('/dashboard');
 }

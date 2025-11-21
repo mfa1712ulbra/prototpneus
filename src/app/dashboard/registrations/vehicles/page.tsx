@@ -101,6 +101,7 @@ export default function PaginaCadastroVeiculo() {
       });
       form.reset({ placa: '', marca: '', modelo: undefined });
     } catch (error) {
+      console.error("Erro ao criar veículo: ", error);
       toast({
         variant: 'destructive',
         title: 'Erro ao cadastrar',
@@ -263,7 +264,7 @@ export default function PaginaCadastroVeiculo() {
                             </AlertDialogTitle>
                             <AlertDialogDescription>
                               Essa ação não pode ser desfeita. Isso excluirá
-                              permanentemente o veículo.
+                              permanentemente o veículo e todos os seus pneus.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
