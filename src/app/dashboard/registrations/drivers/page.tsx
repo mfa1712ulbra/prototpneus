@@ -30,7 +30,7 @@ import {
 
 const schemaFormulario = z.object({
   nome: z.string().min(2, "O nome do motorista é obrigatório."),
-  cnh: z.string().min(10, "A CNH é obrigatória.").max(11),
+  cnh: z.string().min(10, "A CNH é obrigatória.").max(11, "A CNH deve ter no máximo 11 caracteres."),
 });
 
 export default function PaginaCadastroMotorista() {
@@ -62,12 +62,6 @@ export default function PaginaCadastroMotorista() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="font-headline text-2xl font-semibold text-gray-800">
-          Gerenciar Motoristas
-        </h2>
-      </div>
-
       <Card>
         <CardHeader>
           <CardTitle>Cadastrar Novo Motorista</CardTitle>
