@@ -2,16 +2,16 @@
 "use client";
 
 import { useState } from "react";
+import { useParams } from 'next/navigation';
 import { listaVeiculos, type Veiculo, type Pneu } from "@/lib/tipos";
 import { DiagramaVeiculo } from "@/components/vehicle-diagram";
 import { notFound } from "next/navigation";
 
-type PaginaDetalheVeiculoProps = {
-  params: { id: string };
-};
+export default function PaginaDetalheVeiculo() {
+  const params = useParams();
+  const { id } = params;
 
-export default function PaginaDetalheVeiculo({ params }: PaginaDetalheVeiculoProps) {
-  const veiculoInicial = listaVeiculos.find((v) => v.id === params.id);
+  const veiculoInicial = listaVeiculos.find((v) => v.id === id);
   const [veiculo, setVeiculo] = useState<Veiculo | undefined>(veiculoInicial);
 
   if (!veiculo) {
@@ -26,7 +26,15 @@ export default function PaginaDetalheVeiculo({ params }: PaginaDetalheVeiculoPro
         p.id === pneuAtualizado.id ? pneuAtualizado : p
       );
 
-      return { ...veiculoAnterior, pneus: novosPneus };
+      // Também atualiza a data da última checagem para o pneu atualizado
+      const pneuFinal = { ...pneuAtualizado, ultimaChecagem: new Date().toISOString() };
+
+      const pneusFinais = veiculoAnterior.pneus.map(p =>
+        p.id === pneuFinal.id ? pneuFinal : p
+      );
+
+
+      return { ...veiculoAnterior, pneus: pneusFinais };
     });
   };
 
