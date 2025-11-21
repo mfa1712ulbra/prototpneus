@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import type { Veiculo, Pneu } from '@/lib/tipos';
-import { DialogoInfoPneu } from './dialogo-info-pneu';
+import { DialogoInfoPneu } from '@/components/tire-info-dialog';
 import { cn } from '@/lib/utils';
 
 type DiagramaVeiculoProps = {

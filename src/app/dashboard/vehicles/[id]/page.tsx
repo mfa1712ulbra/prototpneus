@@ -1,5 +1,5 @@
 import { listaVeiculos } from "@/lib/tipos";
-import { DiagramaVeiculo } from "@/components/diagrama-veiculo";
+import { DiagramaVeiculo } from "@/components/vehicle-diagram";
 import { notFound } from "next/navigation";
 
 type PaginaDetalheVeiculoProps = {
