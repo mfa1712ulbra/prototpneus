@@ -1,11 +1,10 @@
+'use client';
 
-"use client";
-
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -13,19 +12,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
-import { Save, Truck, Pencil, Trash2 } from "lucide-react";
-import { listaVeiculos as veiculosIniciais, type Veiculo } from "@/lib/tipos";
+} from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
+import { Save, Truck, Pencil, Trash2 } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -33,7 +31,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,58 +42,91 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-
+} from '@/components/ui/alert-dialog';
+import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
+import { collection, query } from 'firebase/firestore';
+import type { Veiculo } from '@/lib/defs';
+import { Skeleton } from '@/components/ui/skeleton';
+import { criarVeiculo, excluirVeiculo } from '@/lib/acoes/veiculosAcoes';
 
 const schemaFormulario = z.object({
-  nome: z.string().min(2, "O nome do veículo é obrigatório."),
-  placa: z.string().min(7, "A placa deve ter 7 caracteres.").max(7, "A placa deve ter 7 caracteres."),
+  placa: z
+    .string()
+    .min(7, 'A placa deve ter 7 caracteres.')
+    .max(7, 'A placa deve ter 7 caracteres.'),
+  marca: z.string().min(2, 'A marca é obrigatória.'),
   modelo: z.string({
-    required_error: "Selecione o modelo do veículo.",
+    required_error: 'Selecione o modelo do veículo.',
   }),
 });
 
 export default function PaginaCadastroVeiculo() {
   const { toast } = useToast();
-  const [listaDeVeiculos, setListaDeVeiculos] = useState<Veiculo[]>(veiculosIniciais);
-  const [veiculoParaExcluir, setVeiculoParaExcluir] = useState<Veiculo | null>(null);
+  const { user } = useUser();
+  const firestore = useFirestore();
+  const [veiculoParaExcluir, setVeiculoParaExcluir] = useState<Veiculo | any | null>(null);
+
+  const veiculosQuery = useMemoFirebase(
+    () =>
+      user ? query(collection(firestore, `usuarios/${user.uid}/veiculos`)) : null,
+    [user, firestore]
+  );
+  
+  const { data: listaDeVeiculos, isLoading } = useCollection<Veiculo>(veiculosQuery);
 
   const form = useForm<z.infer<typeof schemaFormulario>>({
     resolver: zodResolver(schemaFormulario),
     defaultValues: {
-      nome: "",
-      placa: "",
+      placa: '',
+      marca: '',
       modelo: undefined,
     },
   });
 
-  function aoSubmeter(valores: z.infer<typeof schemaFormulario>) {
-    const novoVeiculo: Veiculo = {
-        id: new Date().getTime().toString(),
-        ...valores,
-        pneus: [], // Um novo veículo começa sem pneus detalhados
-    }
-
-    setListaDeVeiculos(veiculosAtuais => [novoVeiculo, ...veiculosAtuais]);
-
-    toast({
-      title: "Sucesso!",
-      description: "Veículo cadastrado com sucesso.",
-    });
-    form.reset({ nome: "", placa: "", modelo: undefined });
-  }
-
-  function handleExcluirVeiculo() {
-    if (veiculoParaExcluir) {
-      setListaDeVeiculos(listaAtual => listaAtual.filter(v => v.id !== veiculoParaExcluir.id));
+  async function aoSubmeter(valores: z.infer<typeof schemaFormulario>) {
+    if (!user) {
       toast({
-        title: "Sucesso!",
-        description: "Veículo excluído."
+        variant: 'destructive',
+        title: 'Erro',
+        description: 'Você precisa estar logado para cadastrar um veículo.',
       });
-      setVeiculoParaExcluir(null);
+      return;
+    }
+
+    try {
+      await criarVeiculo(user.uid, valores);
+      toast({
+        title: 'Sucesso!',
+        description: 'Veículo cadastrado com sucesso.',
+      });
+      form.reset({ placa: '', marca: '', modelo: undefined });
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Erro ao cadastrar',
+        description: 'Não foi possível salvar o veículo. Tente novamente.',
+      });
     }
   }
 
+  async function handleExcluirVeiculo() {
+    if (veiculoParaExcluir && user) {
+      try {
+        await excluirVeiculo(user.uid, veiculoParaExcluir.id);
+        toast({
+          title: 'Sucesso!',
+          description: 'Veículo excluído.',
+        });
+        setVeiculoParaExcluir(null);
+      } catch (error) {
+        toast({
+          variant: 'destructive',
+          title: 'Erro ao excluir',
+          description: 'Não foi possível excluir o veículo. Tente novamente.',
+        });
+      }
+    }
+  }
 
   return (
     <div className="space-y-3">
@@ -105,20 +136,10 @@ export default function PaginaCadastroVeiculo() {
         </CardHeader>
         <CardContent className="p-4">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(aoSubmeter)} className="space-y-2">
-              <FormField
-                control={form.control}
-                name="nome"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome / Apelido</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Scania R450" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <form
+              onSubmit={form.handleSubmit(aoSubmeter)}
+              className="space-y-2"
+            >
               <FormField
                 control={form.control}
                 name="placa"
@@ -134,11 +155,28 @@ export default function PaginaCadastroVeiculo() {
               />
               <FormField
                 control={form.control}
+                name="marca"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Marca</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Scania" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="modelo"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Modelo</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value} defaultValue="">
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      defaultValue=""
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione o modelo" />
@@ -162,7 +200,7 @@ export default function PaginaCadastroVeiculo() {
           </Form>
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader className="p-4">
           <CardTitle className="flex items-center gap-2">
@@ -175,52 +213,84 @@ export default function PaginaCadastroVeiculo() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nome</TableHead>
+                  <TableHead>Marca</TableHead>
                   <TableHead>Placa</TableHead>
                   <TableHead>Modelo</TableHead>
                   <TableHead className="w-[120px] text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {listaDeVeiculos.map((veiculo) => (
+                {isLoading && (
+                   <TableRow>
+                      <TableCell colSpan={4}>
+                        <Skeleton className="h-8 w-full" />
+                      </TableCell>
+                   </TableRow>
+                )}
+                {listaDeVeiculos && listaDeVeiculos.map((veiculo) => (
                   <TableRow key={veiculo.id}>
-                    <TableCell className="font-medium">{veiculo.nome}</TableCell>
+                    <TableCell className="font-medium">
+                      {veiculo.marca}
+                    </TableCell>
                     <TableCell>{veiculo.placa}</TableCell>
                     <TableCell>{veiculo.modelo}</TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => console.log('Editar', veiculo.id)}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => console.log('Editar', veiculo.id)}
+                      >
                         <Pencil className="h-4 w-4" />
                         <span className="sr-only">Editar</span>
                       </Button>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setVeiculoParaExcluir(veiculo)}>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => setVeiculoParaExcluir(veiculo)}
+                          >
                             <Trash2 className="h-4 w-4 text-destructive" />
                             <span className="sr-only">Excluir</span>
                           </Button>
                         </AlertDialogTrigger>
-                         <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Essa ação não pode ser desfeita. Isso excluirá permanentemente o veículo.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel onClick={() => setVeiculoParaExcluir(null)}>Cancelar</AlertDialogCancel>
-                              <AlertDialogAction onClick={handleExcluirVeiculo}>Continuar</AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Você tem certeza?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Essa ação não pode ser desfeita. Isso excluirá
+                              permanentemente o veículo.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel
+                              onClick={() => setVeiculoParaExcluir(null)}
+                            >
+                              Cancelar
+                            </AlertDialogCancel>
+                            <AlertDialogAction onClick={handleExcluirVeiculo}>
+                              Continuar
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
                       </AlertDialog>
                     </TableCell>
                   </TableRow>
                 ))}
+                 {!isLoading && (!listaDeVeiculos || listaDeVeiculos.length === 0) && (
+                    <TableRow>
+                        <TableCell colSpan={4} className="text-center">Nenhum veículo cadastrado.</TableCell>
+                    </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>
         </CardContent>
       </Card>
-
     </div>
   );
 }

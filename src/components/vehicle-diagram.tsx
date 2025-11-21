@@ -1,13 +1,12 @@
-
 'use client';
 
 import { useState } from 'react';
-import type { Veiculo, Pneu } from '@/lib/tipos';
+import type { Veiculo, Pneu } from '@/lib/defs';
 import { DialogoInfoPneu } from '@/components/tire-info-dialog';
 import { cn } from '@/lib/utils';
 
 type DiagramaVeiculoProps = {
-  veiculo: Veiculo;
+  veiculo: Veiculo & { pneus: Pneu[] };
   onSalvarPneu: (pneuAtualizado: Pneu) => void;
 };
 
@@ -45,12 +44,17 @@ const posicoesPneus: Record<string, Record<number, string>> = {
 };
 
 const getCorStatusPneu = (profundidade: number) => {
-    if (profundidade > 6) return 'bg-green-200 border-green-400 text-green-800 hover:bg-green-300';
-    if (profundidade > 4) return 'bg-yellow-200 border-yellow-400 text-yellow-800 hover:bg-yellow-300';
-    return 'bg-red-200 border-red-400 text-red-800 hover:bg-red-300';
-}
+  if (profundidade > 6)
+    return 'bg-green-200 border-green-400 text-green-800 hover:bg-green-300';
+  if (profundidade > 4)
+    return 'bg-yellow-200 border-yellow-400 text-yellow-800 hover:bg-yellow-300';
+  return 'bg-red-200 border-red-400 text-red-800 hover:bg-red-300';
+};
 
-export function DiagramaVeiculo({ veiculo, onSalvarPneu }: DiagramaVeiculoProps) {
+export function DiagramaVeiculo({
+  veiculo,
+  onSalvarPneu,
+}: DiagramaVeiculoProps) {
   const [pneuSelecionado, setPneuSelecionado] = useState<Pneu | null>(null);
   const posicoes = posicoesPneus[veiculo.modelo] || posicoesPneus['6x2'];
 
@@ -62,14 +66,14 @@ export function DiagramaVeiculo({ veiculo, onSalvarPneu }: DiagramaVeiculoProps)
         <div className="absolute left-1/2 top-[10%] h-2 w-24 -translate-x-1/2 rounded-sm bg-gray-300"></div>
         <div className="absolute bottom-[10%] left-1/2 h-2 w-32 -translate-x-1/2 rounded-sm bg-gray-300"></div>
 
-        {veiculo.pneus.map(pneu => (
+        {veiculo.pneus.map((pneu) => (
           <button
             key={pneu.id}
             onClick={() => setPneuSelecionado(pneu)}
             className={cn(
               'absolute flex h-10 w-10 items-center justify-center rounded-full border-2 font-bold shadow-md transition-transform hover:scale-110',
-              getCorStatusPneu(pneu.profundidadeSulco),
-              posicoes[pneu.posicao],
+              getCorStatusPneu(pneu.profundidade),
+              posicoes[pneu.posicao]
             )}
             aria-label={`Inspecionar pneu ${pneu.posicao}`}
           >
@@ -77,7 +81,7 @@ export function DiagramaVeiculo({ veiculo, onSalvarPneu }: DiagramaVeiculoProps)
           </button>
         ))}
       </div>
-      
+
       <div className="mt-4 flex justify-center space-x-4 text-sm">
         <div className="flex items-center">
           <span className="mr-2 h-3 w-3 rounded-full bg-green-500"></span>
@@ -97,7 +101,7 @@ export function DiagramaVeiculo({ veiculo, onSalvarPneu }: DiagramaVeiculoProps)
         <DialogoInfoPneu
           pneu={pneuSelecionado}
           estaAberto={!!pneuSelecionado}
-          onAbrirMudar={aberto => {
+          onAbrirMudar={(aberto) => {
             if (!aberto) setPneuSelecionado(null);
           }}
           onSalvar={onSalvarPneu}
