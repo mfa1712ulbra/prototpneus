@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -5,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { CheckCircle, X } from "lucide-react";
-import type { Tire } from "@/lib/data";
+import type { Pneu } from "@/lib/tipos";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -34,65 +35,64 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
-const formSchema = z.object({
-  pressure: z.coerce.number().min(1, "Pressão é obrigatória"),
-  treadDepth: z.coerce.number().min(1, "Profundidade é obrigatória"),
-  observations: z.string().optional(),
-  movement: z.string().optional(),
+const schemaFormulario = z.object({
+  pressao: z.coerce.number().min(1, "Pressão é obrigatória"),
+  profundidadeSulco: z.coerce.number().min(1, "Profundidade é obrigatória"),
+  observacoes: z.string().optional(),
+  movimentacao: z.string().optional(),
 });
 
-type TireInfoDialogProps = {
-  tire: Tire;
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSave: (updatedTire: Tire) => void;
+type DialogoInfoPneuProps = {
+  pneu: Pneu;
+  estaAberto: boolean;
+  onAbrirMudar: (aberto: boolean) => void;
+  onSalvar: (pneuAtualizado: Pneu) => void;
 };
 
-export function TireInfoDialog({ tire, isOpen, onOpenChange, onSave }: TireInfoDialogProps) {
-  const [isSuccess, setIsSuccess] = useState(false);
+export function DialogoInfoPneu({ pneu, estaAberto, onAbrirMudar, onSalvar }: DialogoInfoPneuProps) {
+  const [sucesso, setSucesso] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof schemaFormulario>>({
+    resolver: zodResolver(schemaFormulario),
     defaultValues: {
-      pressure: tire.pressure,
-      treadDepth: tire.treadDepth,
-      observations: tire.observations || "",
-      movement: "none",
+      pressao: pneu.pressao,
+      profundidadeSulco: pneu.profundidadeSulco,
+      observacoes: pneu.observacoes || "",
+      movimentacao: "nenhuma",
     },
   });
 
-  // Reset form when tire changes
   useEffect(() => {
-    if (tire) {
+    if (pneu) {
       form.reset({
-        pressure: tire.pressure,
-        treadDepth: tire.treadDepth,
-        observations: tire.observations || "",
-        movement: "none",
+        pressao: pneu.pressao,
+        profundidadeSulco: pneu.profundidadeSulco,
+        observacoes: pneu.observacoes || "",
+        movimentacao: "nenhuma",
       });
     }
-    setIsSuccess(false);
-  }, [tire, isOpen, form]);
+    setSucesso(false);
+  }, [pneu, estaAberto, form]);
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const updatedTire = { ...tire, ...values };
-    onSave(updatedTire);
-    setIsSuccess(true);
+  function aoSubmeter(valores: z.infer<typeof schemaFormulario>) {
+    const pneuAtualizado = { ...pneu, ...valores };
+    onSalvar(pneuAtualizado);
+    setSucesso(true);
     setTimeout(() => {
-      onOpenChange(false);
-      setTimeout(() => setIsSuccess(false), 300); // Reset success state after transition
+      onAbrirMudar(false);
+      setTimeout(() => setSucesso(false), 300);
     }, 1500);
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={estaAberto} onOpenChange={onAbrirMudar}>
       <DialogContent 
         className={cn(
-            "top-0 translate-y-0 sm:top-[5vh] sm:rounded-lg p-4",
+            "top-0 mt-4 translate-y-0 sm:top-[5vh] sm:rounded-lg p-4",
             "data-[state=closed]:slide-out-to-top-full data-[state=open]:slide-in-from-top-full"
         )}
       >
-        {isSuccess ? (
+        {sucesso ? (
           <div className="flex h-full flex-col items-center justify-center gap-4 text-center p-8">
             <CheckCircle className="h-16 w-16 text-green-500" />
             <h3 className="text-xl font-semibold">Salvo com Sucesso!</h3>
@@ -100,11 +100,11 @@ export function TireInfoDialog({ tire, isOpen, onOpenChange, onSave }: TireInfoD
           </div>
         ) : (
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex h-full flex-col">
+            <form onSubmit={form.handleSubmit(aoSubmeter)} className="flex h-full flex-col">
               <DialogHeader className="text-left space-y-1">
-                <DialogTitle className="font-headline text-xl">Pneu Posição {tire.position}</DialogTitle>
+                <DialogTitle className="font-headline text-xl">Pneu Posição {pneu.posicao}</DialogTitle>
                 <DialogDescription>
-                  Última checagem: {new Date(tire.lastCheck).toLocaleDateString("pt-BR")}
+                  Última checagem: {new Date(pneu.ultimaChecagem).toLocaleDateString("pt-BR")}
                 </DialogDescription>
               </DialogHeader>
 
@@ -112,7 +112,7 @@ export function TireInfoDialog({ tire, isOpen, onOpenChange, onSave }: TireInfoD
                 <div className="grid grid-cols-2 gap-3">
                   <FormField
                     control={form.control}
-                    name="pressure"
+                    name="pressao"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Pressão (PSI)</FormLabel>
@@ -125,7 +125,7 @@ export function TireInfoDialog({ tire, isOpen, onOpenChange, onSave }: TireInfoD
                   />
                   <FormField
                     control={form.control}
-                    name="treadDepth"
+                    name="profundidadeSulco"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Sulco (mm)</FormLabel>
@@ -139,7 +139,7 @@ export function TireInfoDialog({ tire, isOpen, onOpenChange, onSave }: TireInfoD
                 </div>
                 <FormField
                   control={form.control}
-                  name="observations"
+                  name="observacoes"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Observações</FormLabel>
@@ -152,7 +152,7 @@ export function TireInfoDialog({ tire, isOpen, onOpenChange, onSave }: TireInfoD
                 />
                 <FormField
                   control={form.control}
-                  name="movement"
+                  name="movimentacao"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Controle de Movimentação</FormLabel>
@@ -163,13 +163,13 @@ export function TireInfoDialog({ tire, isOpen, onOpenChange, onSave }: TireInfoD
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="none">Nenhuma ação</SelectItem>
-                          <SelectItem value="inspection">Inspeção</SelectItem>
-                          <SelectItem value="rotation">Rotação</SelectItem>
-                          <SelectItem value="retread">Recapagem</SelectItem>
-                          <SelectItem value="storage">Armazenar</SelectItem>
-                          <SelectItem value="repair">Reparo</SelectItem>
-                          <SelectItem value="discard">Descarte</SelectItem>
+                          <SelectItem value="nenhuma">Nenhuma ação</SelectItem>
+                          <SelectItem value="inspecao">Inspeção</SelectItem>
+                          <SelectItem value="rotacao">Rotação</SelectItem>
+                          <SelectItem value="recapagem">Recapagem</SelectItem>
+                          <SelectItem value="armazenar">Armazenar</SelectItem>
+                          <SelectItem value="reparo">Reparo</SelectItem>
+                          <SelectItem value="descarte">Descarte</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage className="text-xs" />
@@ -179,7 +179,7 @@ export function TireInfoDialog({ tire, isOpen, onOpenChange, onSave }: TireInfoD
               </div>
 
               <DialogFooter className="grid grid-cols-2 gap-2 pt-2">
-                <Button variant="outline" type="button" onClick={() => onOpenChange(false)}>
+                <Button variant="outline" type="button" onClick={() => onAbrirMudar(false)}>
                   <X className="mr-2 h-4 w-4" />
                   Cancelar
                 </Button>

@@ -1,4 +1,4 @@
-import { reports } from "@/lib/data";
+import { listaRelatorios } from "@/lib/tipos";
 import {
   Table,
   TableBody,
@@ -8,10 +8,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import type { MaintenanceReport } from "@/lib/data";
+import type { RelatorioManutencao } from "@/lib/tipos";
 
-const getBadgeVariant = (operation: MaintenanceReport['operation']) => {
-    switch(operation) {
+const getBadgeVariant = (operacao: RelatorioManutencao['operacao']) => {
+    switch(operacao) {
         case 'Recapagem': return 'default';
         case 'Reparo': return 'secondary';
         case 'Inspeção': return 'outline';
@@ -20,7 +20,7 @@ const getBadgeVariant = (operation: MaintenanceReport['operation']) => {
     }
 }
 
-export default function ReportsPage() {
+export default function PaginaRelatorios() {
   return (
     <div className="space-y-4">
       <h2 className="font-headline text-2xl font-semibold text-gray-800">Histórico de Manutenções</h2>
@@ -34,12 +34,12 @@ export default function ReportsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {reports.map((report) => (
-              <TableRow key={report.id}>
-                <TableCell className="font-medium">{new Date(report.date).toLocaleDateString('pt-BR')}</TableCell>
-                <TableCell>{report.vehiclePlate}<br/><span className="text-xs text-muted-foreground">Pneu {report.tirePosition}</span></TableCell>
+            {listaRelatorios.map((relatorio) => (
+              <TableRow key={relatorio.id}>
+                <TableCell className="font-medium">{new Date(relatorio.data).toLocaleDateString('pt-BR')}</TableCell>
+                <TableCell>{relatorio.placaVeiculo}<br/><span className="text-xs text-muted-foreground">Pneu {relatorio.posicaoPneu}</span></TableCell>
                 <TableCell>
-                    <Badge variant={getBadgeVariant(report.operation)}>{report.operation}</Badge>
+                    <Badge variant={getBadgeVariant(relatorio.operacao)}>{relatorio.operacao}</Badge>
                 </TableCell>
               </TableRow>
             ))}

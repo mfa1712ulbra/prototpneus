@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: "Gerencie os pneus da sua frota com facilidade.",
 };
 
-export default function RootLayout({
+export default function LayoutRaiz({
   children,
 }: Readonly<{
   children: React.ReactNode;
