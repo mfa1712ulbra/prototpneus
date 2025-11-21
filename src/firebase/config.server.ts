@@ -1,3 +1,4 @@
+
 // SOMENTE PARA USO NO SERVIDOR (SERVER-SIDE)
 import { initializeApp, getApps, cert, App } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
@@ -11,17 +12,16 @@ const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
 
 let app: App;
 
-if (!getApps().some(app => app.name === 'admin')) {
+if (!getApps().length) {
   app = initializeApp(
     serviceAccount
       ? {
           credential: cert(serviceAccount),
         }
-      : undefined,
-    'admin'
+      : undefined
   );
 } else {
-  app = getApps().find(app => app.name === 'admin')!;
+  app = getApps()[0]!;
 }
 
 
