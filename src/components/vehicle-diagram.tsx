@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 
 type DiagramaVeiculoProps = {
   veiculo: Veiculo;
+  onSalvarPneu: (pneuAtualizado: Pneu) => void;
 };
 
 // Posições dos pneus para diferentes modelos
@@ -49,14 +50,9 @@ const getCorStatusPneu = (profundidade: number) => {
     return 'bg-red-500 border-red-700 hover:bg-red-600';
 }
 
-export function DiagramaVeiculo({ veiculo }: DiagramaVeiculoProps) {
+export function DiagramaVeiculo({ veiculo, onSalvarPneu }: DiagramaVeiculoProps) {
   const [pneuSelecionado, setPneuSelecionado] = useState<Pneu | null>(null);
   const posicoes = posicoesPneus[veiculo.modelo] || posicoesPneus['6x2'];
-
-  const handleSalvar = (pneuAtualizado: Pneu) => {
-    // Aqui você atualizaria o estado ou chamaria uma API
-    console.log('Salvando pneu:', pneuAtualizado);
-  };
 
   return (
     <div className="w-full">
@@ -104,7 +100,7 @@ export function DiagramaVeiculo({ veiculo }: DiagramaVeiculoProps) {
           onAbrirMudar={aberto => {
             if (!aberto) setPneuSelecionado(null);
           }}
-          onSalvar={handleSalvar}
+          onSalvar={onSalvarPneu}
         />
       )}
     </div>
