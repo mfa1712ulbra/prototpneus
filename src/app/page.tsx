@@ -7,7 +7,7 @@ import { ArrowRight, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 export default function PaginaLogin() {
   const router = useRouter();
@@ -20,14 +20,17 @@ export default function PaginaLogin() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm">
-        <Card className="border-none shadow-none">
+        <Card className="border-none bg-transparent shadow-none">
           <CardHeader className="items-center text-center">
             <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-primary">
               <Truck className="h-10 w-10" />
             </div>
-            <CardTitle className="font-headline text-3xl font-bold text-[#008080]">
-              PrototPneus
+            <CardTitle className="font-headline text-3xl font-bold text-primary">
+              TireControl
             </CardTitle>
+            <CardDescription className="text-muted-foreground">
+              Gerencie os pneus da sua frota com facilidade.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-6">
@@ -39,7 +42,7 @@ export default function PaginaLogin() {
                   placeholder="seu.usuario"
                   defaultValue="tecnico"
                   required
-                  className="bg-gray-100"
+                  className="bg-card"
                 />
               </div>
               <div className="space-y-2">
@@ -50,19 +53,19 @@ export default function PaginaLogin() {
                   placeholder="••••••••"
                   defaultValue="123456"
                   required
-                  className="bg-gray-100"
+                  className="bg-card"
                 />
               </div>
-              <Button type="submit" className="w-full font-bold">
+              <Button type="submit" className="w-full bg-accent font-bold text-accent-foreground hover:bg-accent/90">
                 Entrar
-                <ArrowRight className="ml-2" />
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </form>
           </CardContent>
         </Card>
       </div>
       <div className="absolute bottom-4 text-sm text-muted-foreground">
-        Versão 1.00
+        Versão 1.0.0
       </div>
     </main>
   );

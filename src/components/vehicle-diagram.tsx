@@ -45,9 +45,9 @@ const posicoesPneus: Record<string, Record<number, string>> = {
 };
 
 const getCorStatusPneu = (profundidade: number) => {
-    if (profundidade > 6) return 'bg-green-500 border-green-700 hover:bg-green-600';
-    if (profundidade > 4) return 'bg-yellow-500 border-yellow-700 hover:bg-yellow-600';
-    return 'bg-red-500 border-red-700 hover:bg-red-600';
+    if (profundidade > 6) return 'bg-green-200 border-green-400 text-green-800 hover:bg-green-300';
+    if (profundidade > 4) return 'bg-yellow-200 border-yellow-400 text-yellow-800 hover:bg-yellow-300';
+    return 'bg-red-200 border-red-400 text-red-800 hover:bg-red-300';
 }
 
 export function DiagramaVeiculo({ veiculo, onSalvarPneu }: DiagramaVeiculoProps) {
@@ -67,7 +67,7 @@ export function DiagramaVeiculo({ veiculo, onSalvarPneu }: DiagramaVeiculoProps)
             key={pneu.id}
             onClick={() => setPneuSelecionado(pneu)}
             className={cn(
-              'absolute flex h-10 w-10 items-center justify-center rounded-full border-2 font-bold text-white shadow-md transition-transform hover:scale-110',
+              'absolute flex h-10 w-10 items-center justify-center rounded-full border-2 font-bold shadow-md transition-transform hover:scale-110',
               getCorStatusPneu(pneu.profundidadeSulco),
               posicoes[pneu.posicao],
             )}

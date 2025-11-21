@@ -19,11 +19,11 @@ export function CabecalhoApp() {
   const naPaginaPrincipal = pathname === '/dashboard';
 
   return (
-    <header className="sticky top-0 z-10 flex h-16 flex-shrink-0 items-center justify-between bg-[#008080] p-4 text-primary-foreground shadow-md">
+    <header className="sticky top-0 z-10 flex h-16 flex-shrink-0 items-center justify-between bg-primary p-4 text-primary-foreground shadow-md">
       <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 hover:text-white">
+            <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary-foreground/20 hover:text-primary-foreground">
               <Menu className="h-7 w-7" />
               <span className="sr-only">Menu do usuário</span>
             </Button>
@@ -54,11 +54,11 @@ export function CabecalhoApp() {
         </DropdownMenu>
       </div>
       
-      <h1 className="font-headline text-xl font-bold">PrototPneus</h1>
+      <h1 className="font-headline text-xl font-bold">TireControl</h1>
       
       <div className="w-10">
         {!naPaginaPrincipal && (
-          <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 hover:text-white" onClick={() => router.back()}>
+          <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary-foreground/20 hover:text-primary-foreground" onClick={() => router.back()}>
             <ArrowLeft className="h-6 w-6" />
             <span className="sr-only">Voltar</span>
           </Button>
