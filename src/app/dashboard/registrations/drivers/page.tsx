@@ -16,7 +16,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Save } from "lucide-react";
+import { Save, Users } from "lucide-react";
+import { listaMotoristas } from "@/lib/tipos";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const schemaFormulario = z.object({
   nome: z.string().min(2, "O nome do motorista é obrigatório."),
@@ -43,13 +52,45 @@ export default function PaginaCadastroMotorista() {
   }
 
   return (
-    <div className="space-y-4">
-      <h2 className="font-headline text-2xl font-semibold text-gray-800">
-        Cadastrar Motorista
-      </h2>
+    <div className="space-y-6">
+      <div>
+        <h2 className="font-headline text-2xl font-semibold text-gray-800">
+          Gerenciar Motoristas
+        </h2>
+      </div>
+
       <Card>
         <CardHeader>
-          <CardTitle>Informações do Motorista</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Motoristas Cadastrados
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>CNH</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {listaMotoristas.map((motorista) => (
+                  <TableRow key={motorista.id}>
+                    <TableCell className="font-medium">{motorista.nome}</TableCell>
+                    <TableCell>{motorista.cnh}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Cadastrar Novo Motorista</CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>

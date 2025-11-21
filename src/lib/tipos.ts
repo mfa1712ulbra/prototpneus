@@ -79,6 +79,12 @@ export const listaVeiculos: Veiculo[] = [
   },
 ];
 
+export const listaMotoristas: Motorista[] = [
+    { id: '1', nome: 'João da Silva', cnh: '12345678901' },
+    { id: '2', nome: 'Maria Oliveira', cnh: '09876543210' },
+    { id: '3', nome: 'Carlos Pereira', cnh: '11223344556' },
+];
+
 export const listaRelatorios: RelatorioManutencao[] = [
     { id: '1', data: '2025-09-25', placaVeiculo: 'RTS-4567', posicaoPneu: 3, operacao: 'Recapagem', detalhes: 'Recapagem completa realizada na filial de SP.', tecnico: 'Carlos' },
     { id: '2', data: '2025-09-26', placaVeiculo: 'VLC-9876', posicaoPneu: 8, operacao: 'Reparo', detalhes: 'Reparo de furo simples.', tecnico: 'João' },
