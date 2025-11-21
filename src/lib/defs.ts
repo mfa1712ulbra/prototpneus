@@ -2,7 +2,7 @@
 
 export type Pneu = {
   id: string;
-  posicao: number;
+  posicao: string;
   pressao: number;
   profundidade: number;
   ultimaChecagem: string; // ou Date

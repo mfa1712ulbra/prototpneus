@@ -1,6 +1,6 @@
 'use server';
 
-import { db } from '@/firebase/config.server';
+import { getDb } from '@/firebase/config.server';
 import { revalidatePath } from 'next/cache';
 
 interface DadosTipoPneu {
@@ -12,6 +12,7 @@ export async function criarTipoPneu(
   usuarioId: string,
   dados: DadosTipoPneu
 ) {
+  const db = getDb();
   if (!usuarioId) {
     throw new Error('ID do usuário é necessário para criar um tipo de pneu.');
   }
@@ -26,6 +27,7 @@ export async function criarTipoPneu(
 }
 
 export async function excluirTipoPneu(usuarioId: string, tipoPneuId: string) {
+  const db = getDb();
   if (!usuarioId || !tipoPneuId) {
     throw new Error('IDs são necessários para excluir um tipo de pneu.');
   }

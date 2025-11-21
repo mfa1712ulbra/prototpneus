@@ -11,35 +11,35 @@ type DiagramaVeiculoProps = {
 };
 
 // Posições dos pneus para diferentes modelos
-const posicoesPneus: Record<string, Record<number, string>> = {
+const posicoesPneus: Record<string, Record<string, string>> = {
   '6x2': {
     // 6 pneus
-    1: 'top-[10%] left-[5%]',
-    2: 'top-[10%] right-[5%]',
-    3: 'bottom-[10%] left-[5%]',
-    4: 'bottom-[10%] right-[5%]',
-    5: 'bottom-[10%] left-[25%]',
-    6: 'bottom-[10%] right-[25%]',
+    '1': 'top-[10%] left-[5%]',
+    '2': 'top-[10%] right-[5%]',
+    '3': 'bottom-[10%] left-[5%]',
+    '4': 'bottom-[10%] right-[5%]',
+    '5': 'bottom-[10%] left-[25%]',
+    '6': 'bottom-[10%] right-[25%]',
   },
   '6x4': {
     // 10 pneus
-    1: 'top-[5%] left-[5%]',
-    2: 'top-[5%] right-[5%]',
-    3: 'bottom-[25%] left-[5%]',
-    4: 'bottom-[25%] right-[5%]',
-    5: 'bottom-[25%] left-[25%]',
-    6: 'bottom-[25%] right-[25%]',
-    7: 'bottom-[5%] left-[5%]',
-    8: 'bottom-[5%] right-[5%]',
-    9: 'bottom-[5%] left-[25%]',
-    10: 'bottom-[5%] right-[25%]',
+    '1': 'top-[5%] left-[5%]',
+    '2': 'top-[5%] right-[5%]',
+    '3': 'bottom-[25%] left-[5%]',
+    '4': 'bottom-[25%] right-[5%]',
+    '5': 'bottom-[25%] left-[25%]',
+    '6': 'bottom-[25%] right-[25%]',
+    '7': 'bottom-[5%] left-[5%]',
+    '8': 'bottom-[5%] right-[5%]',
+    '9': 'bottom-[5%] left-[25%]',
+    '10': 'bottom-[5%] right-[25%]',
   },
   '4x2': {
     // 4 pneus
-    1: 'top-[15%] left-[5%]',
-    2: 'top-[15%] right-[5%]',
-    3: 'bottom-[15%] left-[5%]',
-    4: 'bottom-[15%] right-[5%]',
+    '1': 'top-[15%] left-[5%]',
+    '2': 'top-[15%] right-[5%]',
+    '3': 'bottom-[15%] left-[5%]',
+    '4': 'bottom-[15%] right-[5%]',
   },
 };
 

@@ -1,6 +1,6 @@
 'use server';
 
-import { db } from '@/firebase/config.server';
+import { getDb } from '@/firebase/config.server';
 import { revalidatePath } from 'next/cache';
 
 interface DadosMotorista {
@@ -12,6 +12,7 @@ export async function criarMotorista(
   usuarioId: string,
   dados: DadosMotorista
 ) {
+  const db = getDb();
   if (!usuarioId) {
     throw new Error('ID do usuário é necessário para criar um motorista.');
   }
@@ -26,6 +27,7 @@ export async function criarMotorista(
 }
 
 export async function excluirMotorista(usuarioId: string, motoristaId: string) {
+  const db = getDb();
   if (!usuarioId || !motoristaId) {
     throw new Error('IDs são necessários para excluir um motorista.');
   }

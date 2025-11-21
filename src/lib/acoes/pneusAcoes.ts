@@ -1,6 +1,6 @@
 'use server';
 
-import { db } from '@/firebase/config.server';
+import { getDb } from '@/firebase/config.server';
 import { revalidatePath } from 'next/cache';
 import { FieldValue } from 'firebase-admin/firestore';
 
@@ -16,6 +16,7 @@ export async function atualizarPneu(
   pneuId: string,
   dados: DadosPneu
 ) {
+  const db = getDb();
   if (!usuarioId || !veiculoId || !pneuId) {
     throw new Error('IDs são necessários para atualizar um pneu.');
   }

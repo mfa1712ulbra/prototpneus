@@ -1,6 +1,6 @@
 'use server';
 
-import { db } from '@/firebase/config.server';
+import { getDb } from '@/firebase/config.server';
 import { revalidatePath } from 'next/cache';
 
 interface DadosVeiculo {
@@ -16,6 +16,7 @@ const posicoesParaModelo: Record<string, number> = {
 }
 
 export async function criarVeiculo(usuarioId: string, dados: DadosVeiculo) {
+  const db = getDb();
   if (!usuarioId) {
     throw new Error('ID do usuário é necessário para criar um veículo.');
   }
@@ -33,7 +34,7 @@ export async function criarVeiculo(usuarioId: string, dados: DadosVeiculo) {
     const pneuRef = veiculoRef.collection('pneus').doc();
     batch.set(pneuRef, {
         id: pneuRef.id,
-        posicao: i,
+        posicao: i.toString(),
         pressao: 0,
         profundidade: 0,
         observacoes: '',
@@ -47,6 +48,7 @@ export async function criarVeiculo(usuarioId: string, dados: DadosVeiculo) {
 }
 
 export async function excluirVeiculo(usuarioId: string, veiculoId: string) {
+  const db = getDb();
   if (!usuarioId || !veiculoId) {
     throw new Error('IDs são necessários para excluir um veículo.');
   }
