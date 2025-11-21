@@ -61,35 +61,6 @@ export default function PaginaCadastroMotorista() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Motoristas Cadastrados
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>CNH</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {listaMotoristas.map((motorista) => (
-                  <TableRow key={motorista.id}>
-                    <TableCell className="font-medium">{motorista.nome}</TableCell>
-                    <TableCell>{motorista.cnh}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader>
           <CardTitle>Cadastrar Novo Motorista</CardTitle>
         </CardHeader>
         <CardContent>
@@ -127,6 +98,35 @@ export default function PaginaCadastroMotorista() {
               </Button>
             </form>
           </Form>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Motoristas Cadastrados
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>CNH</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {listaMotoristas.map((motorista) => (
+                  <TableRow key={motorista.id}>
+                    <TableCell className="font-medium">{motorista.nome}</TableCell>
+                    <TableCell>{motorista.cnh}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>
