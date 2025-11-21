@@ -43,17 +43,14 @@ export default function PaginaCadastroTipoPneu() {
   }
 
   return (
-    <div className="space-y-4">
-      <h2 className="font-headline text-2xl font-semibold text-gray-800">
-        Cadastrar Tipo de Pneu
-      </h2>
+    <div className="space-y-3">
       <Card>
-        <CardHeader>
-          <CardTitle>Informações do Tipo de Pneu</CardTitle>
+        <CardHeader className="p-4">
+          <CardTitle>Cadastrar Tipo de Pneu</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(aoSubmeter)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(aoSubmeter)} className="space-y-2">
               <FormField
                 control={form.control}
                 name="marca"

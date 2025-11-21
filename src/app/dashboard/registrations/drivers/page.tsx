@@ -85,14 +85,14 @@ export default function PaginaCadastroMotorista() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <Card>
         <CardHeader className="p-4">
           <CardTitle>Cadastrar Novo Motorista</CardTitle>
         </CardHeader>
         <CardContent className="p-4">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(aoSubmeter)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(aoSubmeter)} className="space-y-2">
               <FormField
                 control={form.control}
                 name="nome"
