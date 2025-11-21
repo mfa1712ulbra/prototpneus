@@ -13,7 +13,7 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
@@ -25,6 +25,13 @@ export default function PaginaLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const { user, isUserLoading } = useUser();
   const auth = useAuth(); // Obtém a instância de autenticação do provedor
+
+  useEffect(() => {
+    // Se não estiver carregando e o usuário já existir, redirecione.
+    if (!isUserLoading && user) {
+      router.replace('/dashboard');
+    }
+  }, [user, isUserLoading, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +45,7 @@ export default function PaginaLogin() {
         title: 'Login bem-sucedido!',
         description: 'Redirecionando para o dashboard...',
       });
-      router.push('/dashboard');
+      // A navegação será tratada pelo useEffect
     } catch (error: any) {
       let errorMessage = 'Ocorreu um erro. Verifique seu e-mail e senha.';
       switch (error.code) {
@@ -64,18 +71,14 @@ export default function PaginaLogin() {
     }
   };
 
-  // Se o usuário já estiver logado, redirecione para o dashboard
-  if (isUserLoading) {
+  // Se estiver verificando o usuário ou se o usuário já estiver logado,
+  // mostra uma tela de carregamento para evitar piscar a tela de login.
+  if (isUserLoading || user) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
         <p>Carregando...</p>
       </main>
     );
-  }
-
-  if (user) {
-    router.replace('/dashboard');
-    return null;
   }
 
   return (
