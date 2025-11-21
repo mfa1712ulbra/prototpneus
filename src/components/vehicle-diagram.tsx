@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -42,6 +43,12 @@ const posicoesPneus: Record<string, Record<number, string>> = {
   },
 };
 
+const getCorStatusPneu = (profundidade: number) => {
+    if (profundidade > 6) return 'bg-green-500 border-green-700 hover:bg-green-600';
+    if (profundidade > 4) return 'bg-yellow-500 border-yellow-700 hover:bg-yellow-600';
+    return 'bg-red-500 border-red-700 hover:bg-red-600';
+}
+
 export function DiagramaVeiculo({ veiculo }: DiagramaVeiculoProps) {
   const [pneuSelecionado, setPneuSelecionado] = useState<Pneu | null>(null);
   const posicoes = posicoesPneus[veiculo.modelo] || posicoesPneus['6x2'];
@@ -64,8 +71,8 @@ export function DiagramaVeiculo({ veiculo }: DiagramaVeiculoProps) {
             key={pneu.id}
             onClick={() => setPneuSelecionado(pneu)}
             className={cn(
-              'absolute flex h-10 w-10 items-center justify-center rounded-full border-2 bg-gray-600 font-bold text-white shadow-md transition-transform hover:scale-110',
-              pneu.profundidadeSulco < 5 ? 'border-red-500' : 'border-gray-800',
+              'absolute flex h-10 w-10 items-center justify-center rounded-full border-2 font-bold text-white shadow-md transition-transform hover:scale-110',
+              getCorStatusPneu(pneu.profundidadeSulco),
               posicoes[pneu.posicao],
             )}
             aria-label={`Inspecionar pneu ${pneu.posicao}`}
@@ -74,6 +81,22 @@ export function DiagramaVeiculo({ veiculo }: DiagramaVeiculoProps) {
           </button>
         ))}
       </div>
+      
+      <div className="mt-4 flex justify-center space-x-4 text-sm">
+        <div className="flex items-center">
+          <span className="mr-2 h-3 w-3 rounded-full bg-green-500"></span>
+          <span>Bom</span>
+        </div>
+        <div className="flex items-center">
+          <span className="mr-2 h-3 w-3 rounded-full bg-yellow-500"></span>
+          <span>Atenção</span>
+        </div>
+        <div className="flex items-center">
+          <span className="mr-2 h-3 w-3 rounded-full bg-red-500"></span>
+          <span>Crítico</span>
+        </div>
+      </div>
+
       {pneuSelecionado && (
         <DialogoInfoPneu
           pneu={pneuSelecionado}
