@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -17,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Save, Users } from "lucide-react";
-import { listaMotoristas } from "@/lib/tipos";
+import { listaMotoristas as motoristasIniciais, type Motorista } from "@/lib/tipos";
 import {
   Table,
   TableBody,
@@ -34,6 +35,8 @@ const schemaFormulario = z.object({
 
 export default function PaginaCadastroMotorista() {
   const { toast } = useToast();
+  const [listaMotoristas, setListaMotoristas] = useState<Motorista[]>(motoristasIniciais);
+
   const form = useForm<z.infer<typeof schemaFormulario>>({
     resolver: zodResolver(schemaFormulario),
     defaultValues: {
@@ -43,7 +46,13 @@ export default function PaginaCadastroMotorista() {
   });
 
   function aoSubmeter(valores: z.infer<typeof schemaFormulario>) {
-    console.log(valores);
+    const novoMotorista: Motorista = {
+      id: new Date().getTime().toString(), // ID temporário para a lista na tela
+      ...valores,
+    };
+    
+    setListaMotoristas(motoristasAtuais => [novoMotorista, ...motoristasAtuais]);
+
     toast({
       title: "Sucesso!",
       description: "Motorista cadastrado com sucesso.",
