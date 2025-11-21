@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -17,28 +18,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Save } from "lucide-react";
 
-const formSchema = z.object({
-  name: z.string().min(2, "O nome do motorista é obrigatório."),
+const schemaFormulario = z.object({
+  nome: z.string().min(2, "O nome do motorista é obrigatório."),
   cnh: z.string().min(10, "A CNH é obrigatória.").max(11),
 });
 
-export default function DriverRegistrationPage() {
+export default function PaginaCadastroMotorista() {
   const { toast } = useToast();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof schemaFormulario>>({
+    resolver: zodResolver(schemaFormulario),
     defaultValues: {
-      name: "",
+      nome: "",
       cnh: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  function aoSubmeter(valores: z.infer<typeof schemaFormulario>) {
+    console.log(valores);
     toast({
       title: "Sucesso!",
       description: "Motorista cadastrado com sucesso.",
     });
-    form.reset({ name: "", cnh: "" });
+    form.reset({ nome: "", cnh: "" });
   }
 
   return (
@@ -52,10 +53,10 @@ export default function DriverRegistrationPage() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(aoSubmeter)} className="space-y-8">
               <FormField
                 control={form.control}
-                name="name"
+                name="nome"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Nome Completo</FormLabel>

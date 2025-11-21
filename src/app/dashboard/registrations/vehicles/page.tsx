@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -24,32 +25,32 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Save } from "lucide-react";
 
-const formSchema = z.object({
-  name: z.string().min(2, "O nome do veículo é obrigatório."),
-  plate: z.string().min(7, "A placa deve ter 7 caracteres.").max(7),
-  model: z.string({
+const schemaFormulario = z.object({
+  nome: z.string().min(2, "O nome do veículo é obrigatório."),
+  placa: z.string().min(7, "A placa deve ter 7 caracteres.").max(7),
+  modelo: z.string({
     required_error: "Selecione o modelo do veículo.",
   }),
 });
 
-export default function VehicleRegistrationPage() {
+export default function PaginaCadastroVeiculo() {
   const { toast } = useToast();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof schemaFormulario>>({
+    resolver: zodResolver(schemaFormulario),
     defaultValues: {
-      name: "",
-      plate: "",
-      model: undefined,
+      nome: "",
+      placa: "",
+      modelo: undefined,
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  function aoSubmeter(valores: z.infer<typeof schemaFormulario>) {
+    console.log(valores);
     toast({
       title: "Sucesso!",
       description: "Veículo cadastrado com sucesso.",
     });
-    form.reset({ name: "", plate: "", model: "" });
+    form.reset({ nome: "", placa: "", modelo: "" });
   }
 
   return (
@@ -63,10 +64,10 @@ export default function VehicleRegistrationPage() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(aoSubmeter)} className="space-y-8">
               <FormField
                 control={form.control}
-                name="name"
+                name="nome"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Nome / Apelido</FormLabel>
@@ -79,7 +80,7 @@ export default function VehicleRegistrationPage() {
               />
               <FormField
                 control={form.control}
-                name="plate"
+                name="placa"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Placa</FormLabel>
@@ -92,7 +93,7 @@ export default function VehicleRegistrationPage() {
               />
               <FormField
                 control={form.control}
-                name="model"
+                name="modelo"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Modelo</FormLabel>

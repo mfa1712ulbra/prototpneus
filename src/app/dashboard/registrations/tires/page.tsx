@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -17,28 +18,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Save } from "lucide-react";
 
-const formSchema = z.object({
-  brand: z.string().min(2, "A marca é obrigatória."),
-  model: z.string().min(2, "O modelo é obrigatório."),
+const schemaFormulario = z.object({
+  marca: z.string().min(2, "A marca é obrigatória."),
+  modelo: z.string().min(2, "O modelo é obrigatório."),
 });
 
-export default function TireTypeRegistrationPage() {
+export default function PaginaCadastroTipoPneu() {
   const { toast } = useToast();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof schemaFormulario>>({
+    resolver: zodResolver(schemaFormulario),
     defaultValues: {
-      brand: "",
-      model: "",
+      marca: "",
+      modelo: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  function aoSubmeter(valores: z.infer<typeof schemaFormulario>) {
+    console.log(valores);
     toast({
       title: "Sucesso!",
       description: "Tipo de pneu cadastrado com sucesso.",
     });
-    form.reset({ brand: "", model: "" });
+    form.reset({ marca: "", modelo: "" });
   }
 
   return (
@@ -52,10 +53,10 @@ export default function TireTypeRegistrationPage() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(aoSubmeter)} className="space-y-8">
               <FormField
                 control={form.control}
-                name="brand"
+                name="marca"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Marca</FormLabel>
@@ -68,7 +69,7 @@ export default function TireTypeRegistrationPage() {
               />
               <FormField
                 control={form.control}
-                name="model"
+                name="modelo"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Modelo</FormLabel>

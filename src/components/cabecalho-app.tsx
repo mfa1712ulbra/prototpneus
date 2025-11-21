@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
@@ -11,11 +12,11 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-export function AppHeader() {
+export function CabecalhoApp() {
   const router = useRouter();
   const pathname = usePathname();
   
-  const isDashboardHome = pathname === '/dashboard';
+  const naPaginaPrincipal = pathname === '/dashboard';
 
   return (
     <header className="sticky top-0 z-10 flex h-16 flex-shrink-0 items-center justify-between bg-[#008080] p-4 text-primary-foreground shadow-md">
@@ -56,7 +57,7 @@ export function AppHeader() {
       <h1 className="font-headline text-xl font-bold">PrototPneus</h1>
       
       <div className="w-10">
-        {!isDashboardHome && (
+        {!naPaginaPrincipal && (
           <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 hover:text-white" onClick={() => router.back()}>
             <ArrowLeft className="h-6 w-6" />
             <span className="sr-only">Voltar</span>
