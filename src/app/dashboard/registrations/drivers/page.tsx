@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Save, Users } from "lucide-react";
+import { Save, Users, Pencil, Trash2 } from "lucide-react";
 import { listaMotoristas as motoristasIniciais, type Motorista } from "@/lib/tipos";
 import {
   Table,
@@ -27,6 +27,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 const schemaFormulario = z.object({
   nome: z.string().min(2, "O nome do motorista é obrigatório."),
@@ -36,6 +47,8 @@ const schemaFormulario = z.object({
 export default function PaginaCadastroMotorista() {
   const { toast } = useToast();
   const [listaMotoristas, setListaMotoristas] = useState<Motorista[]>(motoristasIniciais);
+  const [motoristaParaExcluir, setMotoristaParaExcluir] = useState<Motorista | null>(null);
+
 
   const form = useForm<z.infer<typeof schemaFormulario>>({
     resolver: zodResolver(schemaFormulario),
@@ -47,7 +60,7 @@ export default function PaginaCadastroMotorista() {
 
   function aoSubmeter(valores: z.infer<typeof schemaFormulario>) {
     const novoMotorista: Motorista = {
-      id: new Date().getTime().toString(), // ID temporário para a lista na tela
+      id: new Date().getTime().toString(), 
       ...valores,
     };
     
@@ -60,15 +73,26 @@ export default function PaginaCadastroMotorista() {
     form.reset({ nome: "", cnh: "" });
   }
 
+  function handleExcluirMotorista() {
+    if (motoristaParaExcluir) {
+      setListaMotoristas(listaAtual => listaAtual.filter(m => m.id !== motoristaParaExcluir.id));
+      toast({
+        title: "Sucesso!",
+        description: "Motorista excluído."
+      });
+      setMotoristaParaExcluir(null);
+    }
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Card>
-        <CardHeader>
+        <CardHeader className="p-4">
           <CardTitle>Cadastrar Novo Motorista</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(aoSubmeter)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(aoSubmeter)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="nome"
@@ -105,19 +129,20 @@ export default function PaginaCadastroMotorista() {
       </Card>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="p-4">
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
             Motoristas Cadastrados
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="rounded-md border">
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Nome</TableHead>
                   <TableHead>CNH</TableHead>
+                  <TableHead className="w-[120px] text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -125,6 +150,32 @@ export default function PaginaCadastroMotorista() {
                   <TableRow key={motorista.id}>
                     <TableCell className="font-medium">{motorista.nome}</TableCell>
                     <TableCell>{motorista.cnh}</TableCell>
+                    <TableCell className="text-right">
+                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => console.log('Editar', motorista.id)}>
+                        <Pencil className="h-4 w-4" />
+                        <span className="sr-only">Editar</span>
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setMotoristaParaExcluir(motorista)}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                            <span className="sr-only">Excluir</span>
+                          </Button>
+                        </AlertDialogTrigger>
+                         <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Essa ação não pode ser desfeita. Isso excluirá permanentemente o motorista.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel onClick={() => setMotoristaParaExcluir(null)}>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction onClick={handleExcluirMotorista}>Continuar</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                      </AlertDialog>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

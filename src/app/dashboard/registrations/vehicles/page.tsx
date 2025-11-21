@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Save, Truck } from "lucide-react";
+import { Save, Truck, Pencil, Trash2 } from "lucide-react";
 import { listaVeiculos as veiculosIniciais, type Veiculo } from "@/lib/tipos";
 import {
   Table,
@@ -34,6 +34,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 
 const schemaFormulario = z.object({
@@ -47,6 +58,7 @@ const schemaFormulario = z.object({
 export default function PaginaCadastroVeiculo() {
   const { toast } = useToast();
   const [listaDeVeiculos, setListaDeVeiculos] = useState<Veiculo[]>(veiculosIniciais);
+  const [veiculoParaExcluir, setVeiculoParaExcluir] = useState<Veiculo | null>(null);
 
   const form = useForm<z.infer<typeof schemaFormulario>>({
     resolver: zodResolver(schemaFormulario),
@@ -73,15 +85,27 @@ export default function PaginaCadastroVeiculo() {
     form.reset({ nome: "", placa: "", modelo: undefined });
   }
 
+  function handleExcluirVeiculo() {
+    if (veiculoParaExcluir) {
+      setListaDeVeiculos(listaAtual => listaAtual.filter(v => v.id !== veiculoParaExcluir.id));
+      toast({
+        title: "Sucesso!",
+        description: "Veículo excluído."
+      });
+      setVeiculoParaExcluir(null);
+    }
+  }
+
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <Card>
-        <CardHeader>
+        <CardHeader className="p-4">
           <CardTitle>Cadastrar Novo Veículo</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(aoSubmeter)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(aoSubmeter)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="nome"
@@ -140,20 +164,21 @@ export default function PaginaCadastroVeiculo() {
       </Card>
       
       <Card>
-        <CardHeader>
+        <CardHeader className="p-4">
           <CardTitle className="flex items-center gap-2">
             <Truck className="h-5 w-5" />
             Veículos Cadastrados
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="rounded-md border">
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Nome</TableHead>
                   <TableHead>Placa</TableHead>
                   <TableHead>Modelo</TableHead>
+                  <TableHead className="w-[120px] text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -162,6 +187,32 @@ export default function PaginaCadastroVeiculo() {
                     <TableCell className="font-medium">{veiculo.nome}</TableCell>
                     <TableCell>{veiculo.placa}</TableCell>
                     <TableCell>{veiculo.modelo}</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => console.log('Editar', veiculo.id)}>
+                        <Pencil className="h-4 w-4" />
+                        <span className="sr-only">Editar</span>
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setVeiculoParaExcluir(veiculo)}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                            <span className="sr-only">Excluir</span>
+                          </Button>
+                        </AlertDialogTrigger>
+                         <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Essa ação não pode ser desfeita. Isso excluirá permanentemente o veículo.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel onClick={() => setVeiculoParaExcluir(null)}>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction onClick={handleExcluirVeiculo}>Continuar</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                      </AlertDialog>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
