@@ -1,15 +1,8 @@
+// Este arquivo não é mais necessário para a autenticação e pode ser removido
+// ou usado para outras ações de servidor no futuro.
+// Por segurança, vou remover a função de login daqui.
 'use server';
 
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/firebase/config.server';
-
-export async function fazerLoginComEmailESenha(email: string, pass: string) {
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, pass);
-    return JSON.parse(JSON.stringify(userCredential.user));
-  } catch (error: any) {
-    // Para simplificar, estamos relançando o erro.
-    // Em um app de produção, você poderia logar o erro ou retornar uma mensagem mais amigável.
-    throw new Error(error.code || 'Erro de autenticação desconhecido');
-  }
-}
+// A função fazerLoginComEmailESenha foi movida para o lado do cliente
+// em src/app/page.tsx, pois essa é a abordagem correta para autenticação
+// com email/senha no Firebase com o Next.js App Router.

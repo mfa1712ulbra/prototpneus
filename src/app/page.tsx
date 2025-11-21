@@ -14,8 +14,8 @@ import {
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
-import { fazerLoginComEmailESenha } from '@/lib/acoes/autenticacaoAcoes';
-import { useUser } from '@/firebase';
+import { useUser, useAuth } from '@/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 export default function PaginaLogin() {
   const router = useRouter();
@@ -24,30 +24,47 @@ export default function PaginaLogin() {
   const [password, setPassword] = useState('123456');
   const [isLoading, setIsLoading] = useState(false);
   const { user, isUserLoading } = useUser();
+  const auth = useAuth(); // Obtém a instância de autenticação do provedor
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await fazerLoginComEmailESenha(email, password);
+      if (!auth) {
+        throw new Error('Serviço de autenticação não está pronto.');
+      }
+      await signInWithEmailAndPassword(auth, email, password);
       toast({
         title: 'Login bem-sucedido!',
         description: 'Redirecionando para o dashboard...',
       });
       router.push('/dashboard');
     } catch (error: any) {
+      let errorMessage = 'Ocorreu um erro. Verifique seu e-mail e senha.';
+      switch (error.code) {
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+        case 'auth/invalid-credential':
+          errorMessage = 'E-mail ou senha inválidos.';
+          break;
+        case 'auth/invalid-email':
+          errorMessage = 'O formato do e-mail é inválido.';
+          break;
+        default:
+          errorMessage = 'Erro de autenticação desconhecido.';
+          break;
+      }
       toast({
         variant: 'destructive',
         title: 'Erro no login',
-        description:
-          error.message || 'Ocorreu um erro. Verifique seu e-mail e senha.',
+        description: errorMessage,
       });
     } finally {
       setIsLoading(false);
     }
   };
-  
-    // Se o usuário já estiver logado, redirecione para o dashboard
+
+  // Se o usuário já estiver logado, redirecione para o dashboard
   if (isUserLoading) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
