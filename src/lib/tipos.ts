@@ -22,6 +22,12 @@ export type Motorista = {
   cnh: string;
 };
 
+export type TipoPneu = {
+  id: string;
+  marca: string;
+  modelo: string;
+};
+
 export type RelatorioManutencao = {
   id: string;
   data: string;
@@ -83,6 +89,13 @@ export const listaMotoristas: Motorista[] = [
     { id: '1', nome: 'João da Silva', cnh: '12345678901' },
     { id: '2', nome: 'Maria Oliveira', cnh: '09876543210' },
     { id: '3', nome: 'Carlos Pereira', cnh: '11223344556' },
+];
+
+export const listaTiposPneu: TipoPneu[] = [
+    { id: '1', marca: 'Michelin', modelo: 'X Multi Z' },
+    { id: '2', marca: 'Pirelli', modelo: 'FR:01' },
+    { id: '3', marca: 'Goodyear', modelo: 'KMax S' },
+    { id: '4', marca: 'Bridgestone', modelo: 'R268' },
 ];
 
 export const listaRelatorios: RelatorioManutencao[] = [
