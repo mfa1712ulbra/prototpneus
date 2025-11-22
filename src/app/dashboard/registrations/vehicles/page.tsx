@@ -94,7 +94,7 @@ export default function PaginaCadastroVeiculo() {
       placa: '',
       marca: '',
       modelo: undefined,
-      motoristaId: undefined,
+      motoristaId: '',
     },
   });
 
@@ -104,10 +104,10 @@ export default function PaginaCadastroVeiculo() {
         placa: veiculoParaEditar.placa,
         marca: veiculoParaEditar.marca,
         modelo: veiculoParaEditar.modelo,
-        motoristaId: veiculoParaEditar.motoristaId || undefined,
+        motoristaId: veiculoParaEditar.motoristaId || '',
       });
     } else {
-       form.reset({ placa: '', marca: '', modelo: undefined, motoristaId: undefined });
+       form.reset({ placa: '', marca: '', modelo: undefined, motoristaId: '' });
     }
   }, [veiculoParaEditar, form]);
 
@@ -174,7 +174,7 @@ export default function PaginaCadastroVeiculo() {
           description: 'Veículo cadastrado com sucesso.',
         });
       }
-      form.reset({ placa: '', marca: '', modelo: undefined, motoristaId: undefined });
+      form.reset({ placa: '', marca: '', modelo: undefined, motoristaId: '' });
     } catch (error) {
       console.error("Erro ao salvar veículo: ", error);
       toast({
@@ -192,7 +192,7 @@ export default function PaginaCadastroVeiculo() {
 
   const handleCancelarEdicao = () => {
     setVeiculoParaEditar(null);
-    form.reset({ placa: '', marca: '', modelo: undefined, motoristaId: undefined });
+    form.reset({ placa: '', marca: '', modelo: undefined, motoristaId: '' });
   };
 
 
@@ -352,11 +352,10 @@ export default function PaginaCadastroVeiculo() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Marca</TableHead>
-                  <TableHead>Placa</TableHead>
+                  <TableHead>Marca/Placa</TableHead>
                   <TableHead>Modelo</TableHead>
                   <TableHead>Motorista</TableHead>
-                  <TableHead className="w-[120px] text-right">Ações</TableHead>
+                  <TableHead className="w-[80px] text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -371,54 +370,58 @@ export default function PaginaCadastroVeiculo() {
                   <TableRow key={veiculo.id}>
                     <TableCell className="font-medium">
                       {veiculo.marca}
+                      <div className="text-xs text-muted-foreground md:hidden">
+                        {veiculo.placa}
+                      </div>
                     </TableCell>
-                    <TableCell>{veiculo.placa}</TableCell>
                     <TableCell>{veiculo.modelo}</TableCell>
                     <TableCell>{getNomeMotorista(veiculo.motoristaId)}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => handleEditar(veiculo)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                        <span className="sr-only">Editar</span>
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => setVeiculoParaExcluir(veiculo)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                            <span className="sr-only">Excluir</span>
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Você tem certeza?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Essa ação não pode ser desfeita. Isso excluirá
-                              permanentemente o veículo e todos os seus pneus.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel
-                              onClick={() => setVeiculoParaExcluir(null)}
+                    <TableCell>
+                      <div className="flex flex-col items-center gap-1 md:flex-row md:justify-end">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => handleEditar(veiculo)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                          <span className="sr-only">Editar</span>
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => setVeiculoParaExcluir(veiculo)}
                             >
-                              Cancelar
-                            </AlertDialogCancel>
-                            <AlertDialogAction onClick={handleExcluirVeiculo}>
-                              Continuar
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                              <span className="sr-only">Excluir</span>
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Você tem certeza?
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Essa ação não pode ser desfeita. Isso excluirá
+                                permanentemente o veículo e todos os seus pneus.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel
+                                onClick={() => setVeiculoParaExcluir(null)}
+                              >
+                                Cancelar
+                              </AlertDialogCancel>
+                              <AlertDialogAction onClick={handleExcluirVeiculo}>
+                                Continuar
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

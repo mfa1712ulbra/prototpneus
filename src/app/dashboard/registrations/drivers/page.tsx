@@ -219,7 +219,7 @@ export default function PaginaCadastroMotorista() {
                 <TableRow>
                   <TableHead>Nome</TableHead>
                   <TableHead>CNH</TableHead>
-                  <TableHead className="w-[120px] text-right">Ações</TableHead>
+                  <TableHead className="w-[80px] text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -236,52 +236,54 @@ export default function PaginaCadastroMotorista() {
                       {motorista.nome}
                     </TableCell>
                     <TableCell>{motorista.cnh}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => handleEditar(motorista)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                        <span className="sr-only">Editar</span>
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => setMotoristaParaExcluir(motorista)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                            <span className="sr-only">Excluir</span>
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Você tem certeza?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Essa ação não pode ser desfeita. Isso excluirá
-                              permanentemente o motorista.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel
-                              onClick={() => setMotoristaParaExcluir(null)}
+                    <TableCell>
+                      <div className="flex flex-col items-center gap-1 md:flex-row md:justify-end">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => handleEditar(motorista)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                          <span className="sr-only">Editar</span>
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => setMotoristaParaExcluir(motorista)}
                             >
-                              Cancelar
-                            </AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={handleExcluirMotorista}
-                            >
-                              Continuar
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                              <span className="sr-only">Excluir</span>
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Você tem certeza?
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Essa ação não pode ser desfeita. Isso excluirá
+                                permanentemente o motorista.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel
+                                onClick={() => setMotoristaParaExcluir(null)}
+                              >
+                                Cancelar
+                              </AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={handleExcluirMotorista}
+                              >
+                                Continuar
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

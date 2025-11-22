@@ -213,7 +213,7 @@ export default function PaginaCadastroTipoPneu() {
                 <TableRow>
                   <TableHead>Marca</TableHead>
                   <TableHead>Modelo</TableHead>
-                  <TableHead className="w-[120px] text-right">Ações</TableHead>
+                  <TableHead className="w-[80px] text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -228,52 +228,54 @@ export default function PaginaCadastroTipoPneu() {
                   <TableRow key={tipo.id}>
                     <TableCell className="font-medium">{tipo.marca}</TableCell>
                     <TableCell>{tipo.modelo}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => handleEditar(tipo)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                        <span className="sr-only">Editar</span>
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => setTipoPneuParaExcluir(tipo)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                            <span className="sr-only">Excluir</span>
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Você tem certeza?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Essa ação não pode ser desfeita. Isso excluirá
-                              permanentemente o tipo de pneu.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel
-                              onClick={() => setTipoPneuParaExcluir(null)}
+                    <TableCell>
+                      <div className="flex flex-col items-center gap-1 md:flex-row md:justify-end">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => handleEditar(tipo)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                          <span className="sr-only">Editar</span>
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => setTipoPneuParaExcluir(tipo)}
                             >
-                              Cancelar
-                            </AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={handleExcluirTipoPneu}
-                            >
-                              Continuar
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                              <span className="sr-only">Excluir</span>
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Você tem certeza?
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Essa ação não pode ser desfeita. Isso excluirá
+                                permanentemente o tipo de pneu.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel
+                                onClick={() => setTipoPneuParaExcluir(null)}
+                              >
+                                Cancelar
+                              </AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={handleExcluirTipoPneu}
+                              >
+                                Continuar
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
