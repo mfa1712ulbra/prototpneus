@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import type { Veiculo, Pneu } from '@/lib/defs';
+import type { Veiculo, Pneu, TipoPneu } from '@/lib/defs';
 import { DialogoInfoPneu } from '@/components/tire-info-dialog';
 import { cn } from '@/lib/utils';
 
 type DiagramaVeiculoProps = {
   veiculo: Veiculo & { pneus: Pneu[] };
+  tiposPneu: TipoPneu[];
   onSalvarPneu: (pneuAtualizado: Pneu) => void;
 };
 
@@ -53,6 +54,7 @@ const getCorStatusPneu = (profundidade: number) => {
 
 export function DiagramaVeiculo({
   veiculo,
+  tiposPneu,
   onSalvarPneu,
 }: DiagramaVeiculoProps) {
   const [pneuSelecionado, setPneuSelecionado] = useState<Pneu | null>(null);
@@ -100,6 +102,7 @@ export function DiagramaVeiculo({
       {pneuSelecionado && (
         <DialogoInfoPneu
           pneu={pneuSelecionado}
+          tiposPneu={tiposPneu}
           estaAberto={!!pneuSelecionado}
           onAbrirMudar={(aberto) => {
             if (!aberto) setPneuSelecionado(null);

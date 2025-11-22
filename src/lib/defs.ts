@@ -5,8 +5,9 @@ export type Pneu = {
   posicao: string;
   pressao: number;
   profundidade: number;
-  ultimaChecagem: string; // ou Date
+  ultimaChecagem: any; // Mantido como any para flexibilidade com Timestamps
   observacoes?: string;
+  tipoPneuId?: string;
 };
 
 export type Veiculo = {

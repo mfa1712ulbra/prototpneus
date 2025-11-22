@@ -71,9 +71,9 @@
           "type": "string",
           "description": "Identificador único para o pneu."
         },
-        "veiculoId": {
+        "tipoPneuId": {
           "type": "string",
-          "description": "Referência para o Veiculo. (Relacionamento: Veiculo 1:N Pneu)"
+          "description": "Referência para o TipoPneu."
         },
         "posicao": {
           "type": "string",
@@ -90,13 +90,16 @@
         "observacoes": {
           "type": "string",
           "description": "Observações sobre o pneu."
+        },
+        "ultimaChecagem": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Data da última checagem do pneu."
         }
       },
       "required": [
         "id",
-        "posicao",
-        "pressao",
-        "profundidade"
+        "posicao"
       ]
     },
     "Movimentacao": {
@@ -111,7 +114,7 @@
         },
         "pneuId": {
           "type": "string",
-          "description": "Referência para o Pneu. (Relacionamento: Pneu 1:N Movimentacao)"
+          "description": "Referência para o Pneu."
         },
         "data": {
           "type": "string",
@@ -132,6 +135,56 @@
         "pneuId",
         "data",
         "tipo"
+      ]
+    },
+    "Motorista": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Motorista",
+      "type": "object",
+      "description": "Entidade que armazena informações dos motoristas.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Identificador único para o motorista."
+        },
+        "nome": {
+          "type": "string",
+          "description": "Nome completo do motorista."
+        },
+        "cnh": {
+          "type": "string",
+          "description": "Número da CNH do motorista."
+        }
+      },
+      "required": [
+        "id",
+        "nome",
+        "cnh"
+      ]
+    },
+    "TipoPneu": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "TipoPneu",
+      "type": "object",
+      "description": "Entidade que armazena os tipos (marca/modelo) de pneus.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Identificador único para o tipo de pneu."
+        },
+        "marca": {
+          "type": "string",
+          "description": "Marca do pneu."
+        },
+        "modelo": {
+          "type": "string",
+          "description": "Modelo do pneu."
+        }
+      },
+      "required": [
+        "id",
+        "marca",
+        "modelo"
       ]
     }
   },
@@ -157,71 +210,95 @@
               "description": "Identificador único do usuário."
             }
           ]
-        }
-      },
-      {
-        "path": "/usuarios/{usuarioId}/veiculos/{veiculoId}",
-        "definition": {
-          "entityName": "Veiculo",
-          "schema": {
-            "$ref": "#/backend/entities/Veiculo"
-          },
-          "description": "Armazena informações dos veículos de cada usuário.",
-          "params": [
-            {
-              "name": "usuarioId",
-              "description": "Identificador único do usuário."
-            },
-            {
-              "name": "veiculoId",
-              "description": "Identificador único do veículo."
-            }
-          ]
         },
         "subcollections": [
           {
-            "path": "pneus/{pneuId}",
+            "path": "veiculos/{veiculoId}",
             "definition": {
-              "entityName": "Pneu",
+              "entityName": "Veiculo",
               "schema": {
-                "$ref": "#/backend/entities/Pneu"
+                "$ref": "#/backend/entities/Veiculo"
               },
-              "description": "Armazena informações dos pneus de cada veículo.",
+              "description": "Armazena informações dos veículos de cada usuário.",
               "params": [
                 {
-                  "name": "pneuId",
-                  "description": "Identificador único do pneu."
+                  "name": "veiculoId",
+                  "description": "Identificador único do veículo."
+                }
+              ]
+            },
+            "subcollections": [
+              {
+                "path": "pneus/{pneuId}",
+                "definition": {
+                  "entityName": "Pneu",
+                  "schema": {
+                    "$ref": "#/backend/entities/Pneu"
+                  },
+                  "description": "Armazena informações dos pneus de cada veículo.",
+                  "params": [
+                    {
+                      "name": "pneuId",
+                      "description": "Identificador único do pneu."
+                    }
+                  ],
+                  "subcollections": [
+                    {
+                      "path": "movimentacoes/{movimentacaoId}",
+                      "definition": {
+                        "entityName": "Movimentacao",
+                        "schema": {
+                          "$ref": "#/backend/entities/Movimentacao"
+                        },
+                        "description": "Armazena o histórico de movimentações de um pneu.",
+                        "params": [
+                          {
+                            "name": "movimentacaoId",
+                            "description": "Identificador único da movimentação."
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "path": "motoristas/{motoristaId}",
+            "definition": {
+              "entityName": "Motorista",
+              "schema": {
+                "$ref": "#/backend/entities/Motorista"
+              },
+              "description": "Armazena os motoristas cadastrados pelo usuário.",
+              "params": [
+                {
+                  "name": "motoristaId",
+                  "description": "Identificador único do motorista."
+                }
+              ]
+            }
+          },
+          {
+            "path": "tiposPneu/{tipoPneuId}",
+            "definition": {
+              "entityName": "TipoPneu",
+              "schema": {
+                "$ref": "#/backend/entities/TipoPneu"
+              },
+              "description": "Armazena os tipos de pneu cadastrados pelo usuário.",
+              "params": [
+                {
+                  "name": "tipoPneuId",
+                  "description": "Identificador único do tipo de pneu."
                 }
               ]
             }
           }
         ]
-      },
-      {
-        "path": "/usuarios/{usuarioId}/pneus/{pneuId}/movimentacoes/{movimentacaoId}",
-        "definition": {
-          "entityName": "Movimentacao",
-          "schema": {
-            "$ref": "#/backend/entities/Movimentacao"
-          },
-          "description": "Armazena o histórico de movimentações dos pneus. Garante o relacionamento 1:N entre pneus e movimentações.",
-          "params": [
-            {
-              "name": "usuarioId",
-              "description": "Identificador único do usuário."
-            },
-            {
-              "name": "pneuId",
-              "description": "Identificador único do pneu."
-            },
-            {
-              "name": "movimentacaoId",
-              "description": "Identificador único da movimentação."
-            }
-          ]
-        }
       }
     ],
-    "reasoning": "A estrutura do Firestore foi projetada para ser simples e eficiente para o aplicativo PrototPneus, priorizando a propriedade dos dados e regras de segurança claras. Os veículos são uma subcoleção de usuários, e os pneus são uma subcoleção de veículos, criando uma hierarquia natural que simplifica as permissões. Cada usuário só pode acessar seus próprios dados."
+    "reasoning": "A estrutura do Firestore foi projetada para ser simples e eficiente para o aplicativo PrototPneus, priorizando a propriedade dos dados e regras de segurança claras. Os veículos, motoristas e tipos de pneu são subcoleções de usuários, e os pneus são uma subcoleção de veículos, criando uma hierarquia natural que simplifica as permissões. Cada usuário só pode acessar seus próprios dados."
   }
 }

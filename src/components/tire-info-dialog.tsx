@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { CheckCircle, X } from 'lucide-react';
-import type { Pneu } from '@/lib/defs';
+import type { Pneu, TipoPneu } from '@/lib/defs';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -38,12 +38,14 @@ import { format } from 'date-fns';
 const schemaFormulario = z.object({
   pressao: z.coerce.number().min(1, 'Pressão é obrigatória'),
   profundidade: z.coerce.number().min(0.1, 'Profundidade é obrigatória'),
+  tipoPneuId: z.string().optional(),
   observacoes: z.string().optional(),
   movimentacao: z.string().optional(),
 });
 
 type DialogoInfoPneuProps = {
   pneu: Pneu;
+  tiposPneu: TipoPneu[];
   estaAberto: boolean;
   onAbrirMudar: (aberto: boolean) => void;
   onSalvar: (pneuAtualizado: Pneu) => void;
@@ -51,6 +53,7 @@ type DialogoInfoPneuProps = {
 
 export function DialogoInfoPneu({
   pneu,
+  tiposPneu,
   estaAberto,
   onAbrirMudar,
   onSalvar,
@@ -68,6 +71,7 @@ export function DialogoInfoPneu({
         profundidade: pneu.profundidade,
         observacoes: pneu.observacoes || '',
         movimentacao: 'nenhuma',
+        tipoPneuId: pneu.tipoPneuId || '',
       });
     }
     setSucesso(false);
@@ -148,6 +152,35 @@ export function DialogoInfoPneu({
                     )}
                   />
                 </div>
+                 <FormField
+                  control={form.control}
+                  name="tipoPneuId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tipo de Pneu</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        defaultValue=""
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione um tipo" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                           <SelectItem value="">Nenhum</SelectItem>
+                           {tiposPneu.map((tipo) => (
+                            <SelectItem key={tipo.id} value={tipo.id}>
+                              {tipo.marca} {tipo.modelo}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="observacoes"

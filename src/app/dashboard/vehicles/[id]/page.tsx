@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { DiagramaVeiculo } from '@/components/vehicle-diagram';
 import { useDoc, useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
 import { doc, collection, query, updateDoc, serverTimestamp } from 'firebase/firestore';
-import type { Veiculo, Pneu } from '@/lib/defs';
+import type { Veiculo, Pneu, TipoPneu } from '@/lib/defs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { AlertCircle } from 'lucide-react';
@@ -29,7 +29,14 @@ export default function PaginaDetalheVeiculo() {
   );
   const { data: pneus, isLoading: isLoadingPneus } = useCollection<Pneu>(pneusQuery);
 
-  if (isLoadingVeiculo || isLoadingPneus) {
+  const tiposPneuQuery = useMemoFirebase(
+    () => (user ? query(collection(firestore, `usuarios/${user.uid}/tiposPneu`)) : null),
+    [user, firestore]
+  );
+  const { data: tiposPneu, isLoading: isLoadingTiposPneu } = useCollection<TipoPneu>(tiposPneuQuery);
+
+
+  if (isLoadingVeiculo || isLoadingPneus || isLoadingTiposPneu) {
     return (
       <div className="space-y-4">
         <div className="text-center">
@@ -41,7 +48,7 @@ export default function PaginaDetalheVeiculo() {
     );
   }
 
-  if (!veiculo) {
+  if (!isLoadingVeiculo && !veiculo) {
      return (
       <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-full py-10">
         <AlertCircle className="h-12 w-12 mb-4" />
@@ -51,6 +58,10 @@ export default function PaginaDetalheVeiculo() {
     );
   }
 
+  // A verificação do veículo é feita acima
+  if (!veiculo) return null;
+
+
   const handleSalvarPneu = async (pneuAtualizado: Pneu) => {
     if (!user || !id || !firestore) return;
     try {
@@ -59,6 +70,7 @@ export default function PaginaDetalheVeiculo() {
         pressao: pneuAtualizado.pressao,
         profundidade: pneuAtualizado.profundidade,
         observacoes: pneuAtualizado.observacoes,
+        tipoPneuId: pneuAtualizado.tipoPneuId || null,
         ultimaChecagem: serverTimestamp(),
       });
        toast({
@@ -87,6 +99,7 @@ export default function PaginaDetalheVeiculo() {
       <DiagramaVeiculo
         veiculo={veiculoCompleto}
         onSalvarPneu={handleSalvarPneu}
+        tiposPneu={tiposPneu || []}
       />
     </div>
   );
