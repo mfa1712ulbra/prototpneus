@@ -10,32 +10,28 @@ let app: App;
 let auth: Auth;
 let db: Firestore;
 
-try {
-    const serviceAccount = JSON.parse(
-        process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string
-    );
-
-    if (!getApps().length) {
+if (!getApps().length) {
+    try {
+        // Tenta inicializar com as credenciais da conta de serviço, se disponíveis
+        const serviceAccount = JSON.parse(
+            process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string
+        );
         app = initializeApp({
             credential: cert(serviceAccount),
         });
-    } else {
-        app = getApps()[0]!;
-    }
-} catch (e: any) {
-    console.error("Falha ao inicializar o Firebase Admin SDK com a chave da conta de serviço. Tentando inicialização padrão.");
-    // Em ambientes como o App Hosting, a inicialização padrão pode funcionar.
-     if (!getApps().length) {
+    } catch (e) {
+        // Se falhar (ex: a variável de ambiente não existe), tenta a inicialização padrão.
+        // Isso funciona em ambientes do Google Cloud (como o App Hosting) que fornecem credenciais automaticamente.
+        console.warn("Falha ao inicializar com a chave da conta de serviço. Tentando inicialização padrão do ambiente.");
         app = initializeApp();
-    } else {
-        app = getApps()[0]!;
     }
+} else {
+    // Se já houver um app inicializado, apenas o obtemos.
+    app = getApps()[0]!;
 }
-
 
 auth = getAuth(app);
 db = getFirestore(app);
-
 
 // Funções "getter" que retornam as instâncias já inicializadas.
 // As Server Actions importarão estas funções.
