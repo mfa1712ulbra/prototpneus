@@ -8,8 +8,8 @@
  * The data is organized hierarchically under `/usuarios/{usuarioId}`, with subcollections for vehicles, tires, and movement history:
  * - /usuarios/{usuarioId}
  * - /usuarios/{usuarioId}/veiculos/{veiculoId}
- * - /usuarios/{usuarioId}/pneus/{pneuId}
- * - /usuarios/{usuarioId}/pneus/{pneuId}/movimentacoes/{movimentacaoId}
+ * - /usuarios/{usuarioId}/veiculos/{veiculoId}/pneus/{pneuId}
+ * - /usuarios/{usuarioId}/veiculos/{veiculoId}/pneus/{pneuId}/movimentacoes/{movimentacaoId}
  * - /usuarios/{usuarioId}/motoristas/{motoristaId}
  * - /usuarios/{usuarioId}/tiposPneu/{tipoPneuId}
  *
@@ -17,144 +17,64 @@
  * - All data is private and accessible only to the owning user.
  * - Listing other users' data is disallowed.
  * - Rules are structured to avoid costly `get()` operations by leveraging path-based ownership.
- *
- * Denormalization for Authorization:
- * The `veiculoId` is denormalized into the `Pneu` entity to make authorization checks easier and more efficient. This removes the need to query the parent `Veiculo` document.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
     /**
      * @description Controls access to user profile data.
-     * @path /usuarios/{usuarioId}
-     * @allow (create) User with ID 'user_abc' can create their profile.
-     *   `request.auth.uid == 'user_abc'`
-     *   `request.resource.data.id == 'user_abc'`
-     * @allow (get, list, update, delete) User with ID 'user_abc' can read, update, and delete their profile.
-     *   `request.auth.uid == 'user_abc'`
-     * @deny (create) User with ID 'user_xyz' cannot create a profile with ID 'user_abc'.
-     *   `request.auth.uid == 'user_xyz'`
-     *   `request.resource.data.id == 'user_abc'`
-     * @deny (get, list, update, delete) User with ID 'user_xyz' cannot access user profile 'user_abc'.
-     *   `request.auth.uid == 'user_xyz'`
-     * @principle Enforces document ownership; only the user can create, view, modify, or delete their own profile.
+     * @principle Enforces document ownership; only the user can manage their own profile.
      */
     match /usuarios/{usuarioId} {
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
-      }
-
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
-      allow get: if isOwner(usuarioId);
-      allow list: if false;
+      allow get, update, delete: if isOwner(usuarioId);
       allow create: if isOwner(usuarioId) && request.resource.data.id == usuarioId;
-      allow update: if isExistingOwner(usuarioId) && request.resource.data.id == resource.data.id;
-      allow delete: if isExistingOwner(usuarioId);
+      // Disallow listing all users
+      allow list: if false;
     }
 
     /**
      * @description Controls access to vehicle data for a specific user.
-     * @path /usuarios/{usuarioId}/veiculos/{veiculoId}
-     * @allow (create) User with ID 'user_abc' can create a vehicle.
-     *   `request.auth.uid == 'user_abc'`
-     * @allow (get, list, update, delete) User with ID 'user_abc' can read, update, and delete their vehicles.
-     *   `request.auth.uid == 'user_abc'`
-     * @deny (create) User with ID 'user_xyz' cannot create a vehicle for 'user_abc'.
-     *   `request.auth.uid == 'user_xyz'`
-     * @deny (get, list, update, delete) User with ID 'user_xyz' cannot access vehicles for 'user_abc'.
-     *   `request.auth.uid == 'user_xyz'`
-     * @principle Enforces document ownership; only the user can create, view, modify, or delete their own vehicles.
+     * @principle Enforces document ownership; only the user can manage their own vehicles.
      */
     match /usuarios/{usuarioId}/veiculos/{veiculoId} {
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
-      }
-
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
-      allow get, list, create, update, delete: if isOwner(usuarioId);
+      allow read, write: if isOwner(usuarioId);
     }
 
     /**
-     * @description Controls access to tire data for a specific vehicle of a specific user.
-     * @path /usuarios/{usuarioId}/veiculos/{veiculoId}/pneus/{pneuId}
-     * @allow (create) User with ID 'user_abc' can create a tire.
-     *   `request.auth.uid == 'user_abc'`
-     * @allow (get, list, update, delete) User with ID 'user_abc' can read, update, and delete their tires.
-     *   `request.auth.uid == 'user_abc'`
-     * @deny (create) User with ID 'user_xyz' cannot create a tire for 'user_abc'.
-     *   `request.auth.uid == 'user_xyz'`
-     * @deny (get, list, update, delete) User with ID 'user_xyz' cannot access tires for 'user_abc'.
-     *   `request.auth.uid == 'user_xyz'`
-     * @principle Enforces document ownership; only the user can create, view, modify, or delete their own tires.
+     * @description Controls access to tire data for a specific vehicle.
+     * @principle Enforces document ownership; only the user can manage tires on their own vehicles.
      */
     match /usuarios/{usuarioId}/veiculos/{veiculoId}/pneus/{pneuId} {
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
-      }
-
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
-      allow get, list, create, update, delete: if isOwner(usuarioId);
+      allow read, write: if isOwner(usuarioId);
     }
-
+    
     /**
-     * @description Controls access to tire movement data for a specific tire of a specific vehicle of a specific user.
-     * @path /usuarios/{usuarioId}/veiculos/{veiculoId}/pneus/{pneuId}/movimentacoes/{movimentacaoId}
-     * @allow (create) User with ID 'user_abc' can create a tire movement.
-     *   `request.auth.uid == 'user_abc'`
-     * @allow (get, list, update, delete) User with ID 'user_abc' can read, update, and delete their tire movements.
-     *   `request.auth.uid == 'user_abc'`
-     * @deny (create) User with ID 'user_xyz' cannot create a tire movement for 'user_abc'.
-     *   `request.auth.uid == 'user_xyz'`
-     * @deny (get, list, update, delete) User with ID 'user_xyz' cannot access tire movements for 'user_abc'.
-     *   `request.auth.uid == 'user_xyz'`
-     * @principle Enforces document ownership; only the user can create, view, modify, or delete their own tire movements.
+     * @description Controls access to tire movement data for a specific tire.
+     * @principle Enforces document ownership; only the user can manage movements for their own tires.
      */
     match /usuarios/{usuarioId}/veiculos/{veiculoId}/pneus/{pneuId}/movimentacoes/{movimentacaoId} {
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
-      }
-
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
-
-      allow get, list, create, update, delete: if isOwner(usuarioId);
+       allow read, write: if isOwner(usuarioId);
     }
 
     /**
      * @description Controls access to driver data for a specific user.
-     * @path /usuarios/{usuarioId}/motoristas/{motoristaId}
      * @principle Enforces document ownership; only the user can manage their own drivers.
      */
     match /usuarios/{usuarioId}/motoristas/{motoristaId} {
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
-      }
-
-      allow get, list, create, update, delete: if isOwner(usuarioId);
+      allow read, write: if isOwner(usuarioId);
     }
 
     /**
      * @description Controls access to tire type data for a specific user.
-     * @path /usuarios/{usuarioId}/tiposPneu/{tipoPneuId}
      * @principle Enforces document ownership; only the user can manage their own tire types.
      */
     match /usuarios/{usuarioId}/tiposPneu/{tipoPneuId} {
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
-      }
-
-      allow get, list, create, update, delete: if isOwner(usuarioId);
+      allow read, write: if isOwner(usuarioId);
     }
   }
 }

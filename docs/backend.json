@@ -94,7 +94,6 @@
       },
       "required": [
         "id",
-        "veiculoId",
         "posicao",
         "pressao",
         "profundidade"
@@ -167,7 +166,7 @@
           "schema": {
             "$ref": "#/backend/entities/Veiculo"
           },
-          "description": "Armazena informações dos veículos de cada usuário. Garante o relacionamento 1:N entre usuários e veículos.",
+          "description": "Armazena informações dos veículos de cada usuário.",
           "params": [
             {
               "name": "usuarioId",
@@ -178,34 +177,28 @@
               "description": "Identificador único do veículo."
             }
           ]
-        }
-      },
-      {
-        "path": "/usuarios/{usuarioId}/veiculos/{veiculoId}/pneus/{pneuId}",
-        "definition": {
-          "entityName": "Pneu",
-          "schema": {
-            "$ref": "#/backend/entities/Pneu"
-          },
-          "description": "Armazena informações dos pneus de cada veículo. Inclui 'veiculoId' denormalizado para independência de autorização.",
-          "params": [
-            {
-              "name": "usuarioId",
-              "description": "Identificador único do usuário."
-            },
-            {
-              "name": "veiculoId",
-              "description": "Identificador único do veículo."
-            },
-            {
-              "name": "pneuId",
-              "description": "Identificador único do pneu."
+        },
+        "subcollections": [
+          {
+            "path": "pneus/{pneuId}",
+            "definition": {
+              "entityName": "Pneu",
+              "schema": {
+                "$ref": "#/backend/entities/Pneu"
+              },
+              "description": "Armazena informações dos pneus de cada veículo.",
+              "params": [
+                {
+                  "name": "pneuId",
+                  "description": "Identificador único do pneu."
+                }
+              ]
             }
-          ]
-        }
+          }
+        ]
       },
       {
-        "path": "/usuarios/{usuarioId}/veiculos/{veiculoId}/pneus/{pneuId}/movimentacoes/{movimentacaoId}",
+        "path": "/usuarios/{usuarioId}/pneus/{pneuId}/movimentacoes/{movimentacaoId}",
         "definition": {
           "entityName": "Movimentacao",
           "schema": {
@@ -216,10 +209,6 @@
             {
               "name": "usuarioId",
               "description": "Identificador único do usuário."
-            },
-            {
-              "name": "veiculoId",
-              "description": "Identificador único do veículo."
             },
             {
               "name": "pneuId",
@@ -233,6 +222,6 @@
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to manage vehicle and tire information efficiently, catering specifically to the PrototPneus application's requirements. It prioritizes authorization independence and clear data relationships. The structure leverages path-based ownership for user-specific data and employs denormalization to avoid complex security rules that rely on `get()` calls. \n\n*   `/usuarios/{usuarioId}`: Stores user data. This collection is at the root level, allowing easy access to user profiles. Each user document is identified by a unique `usuarioId`.\n*   `/usuarios/{usuarioId}/veiculos/{veiculoId}`:  Stores vehicle data owned by each user. The `veiculos` subcollection is nested under each user, reflecting the 1:N relationship between users and vehicles. This structure clearly establishes ownership and simplifies security rules. This structure provides clear ownership.\n*   `/usuarios/{usuarioId}/veiculos/{veiculoId}/pneus/{pneuId}`: Stores tire data associated with each vehicle. Nested under the `veiculos` subcollection, it represents the 1:N relationship between vehicles and tires. This structure maintains clear ownership from user down to tires and simplifies security rules. Includes `veiculoId` denormalized from parent to enable authorization independence. This structure provides clear ownership.\n*   `/usuarios/{usuarioId}/veiculos/{veiculoId}/pneus/{pneuId}/movimentacoes/{movimentacaoId}`: Stores tire movement history for each tire. This subcollection provides a detailed log of all tire-related activities and simplifies querying the history.\n\nThis structure ensures authorization independence by avoiding the need for `get()` calls in security rules. Each document contains sufficient information within its path to determine access control. QAPs are supported through structural segregation, ensuring that listing operations can be secured based on path-based ownership."
+    "reasoning": "A estrutura do Firestore foi projetada para ser simples e eficiente para o aplicativo PrototPneus, priorizando a propriedade dos dados e regras de segurança claras. Os veículos são uma subcoleção de usuários, e os pneus são uma subcoleção de veículos, criando uma hierarquia natural que simplifica as permissões. Cada usuário só pode acessar seus próprios dados."
   }
 }
