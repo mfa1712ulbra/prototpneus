@@ -31,6 +31,14 @@ export type TipoPneu = {
   modelo: string;
 };
 
+export type Movimentacao = {
+  id: string;
+  pneuId: string;
+  data: any;
+  tipo: string;
+  descricao?: string;
+}
+
 export type RelatorioManutencao = {
   id: string;
   data: string;
