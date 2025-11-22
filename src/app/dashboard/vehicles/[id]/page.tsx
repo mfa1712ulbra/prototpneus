@@ -4,10 +4,9 @@ import { useState } from 'react';
 import { useParams, notFound } from 'next/navigation';
 import { DiagramaVeiculo } from '@/components/vehicle-diagram';
 import { useDoc, useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
-import { doc, collection, query } from 'firebase/firestore';
+import { doc, collection, query, updateDoc, serverTimestamp } from 'firebase/firestore';
 import type { Veiculo, Pneu } from '@/lib/defs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { atualizarPneu } from '@/lib/acoes/pneusAcoes';
 import { useToast } from '@/hooks/use-toast';
 
 export default function PaginaDetalheVeiculo() {
@@ -46,12 +45,14 @@ export default function PaginaDetalheVeiculo() {
   }
 
   const handleSalvarPneu = async (pneuAtualizado: Pneu) => {
-    if (!user || !id) return;
+    if (!user || !id || !firestore) return;
     try {
-      await atualizarPneu(user.uid, id.toString(), pneuAtualizado.id, {
+      const pneuDocRef = doc(firestore, `usuarios/${user.uid}/veiculos/${id}/pneus/${pneuAtualizado.id}`);
+      await updateDoc(pneuDocRef, {
         pressao: pneuAtualizado.pressao,
         profundidade: pneuAtualizado.profundidade,
         observacoes: pneuAtualizado.observacoes,
+        ultimaChecagem: serverTimestamp(),
       });
        toast({
         title: "Sucesso",

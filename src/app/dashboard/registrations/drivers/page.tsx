@@ -36,11 +36,10 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
-import { collection, query } from 'firebase/firestore';
+import { collection, query, addDoc, deleteDoc, doc } from 'firebase/firestore';
 import type { Motorista } from '@/lib/defs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState } from 'react';
-import { criarMotorista, excluirMotorista } from '@/lib/acoes/motoristasAcoes';
 
 const schemaFormulario = z.object({
   nome: z.string().min(2, 'O nome do motorista é obrigatório.'),
@@ -74,7 +73,7 @@ export default function PaginaCadastroMotorista() {
   });
 
   async function aoSubmeter(valores: z.infer<typeof schemaFormulario>) {
-    if (!user) {
+    if (!user || !firestore) {
       toast({
         variant: 'destructive',
         title: 'Erro',
@@ -84,7 +83,8 @@ export default function PaginaCadastroMotorista() {
     }
 
     try {
-      await criarMotorista(user.uid, valores);
+      const motoristasCollectionRef = collection(firestore, `usuarios/${user.uid}/motoristas`);
+      await addDoc(motoristasCollectionRef, valores);
       toast({
         title: 'Sucesso!',
         description: 'Motorista cadastrado com sucesso.',
@@ -100,9 +100,9 @@ export default function PaginaCadastroMotorista() {
   }
 
   async function handleExcluirMotorista() {
-    if (motoristaParaExcluir && user) {
+    if (motoristaParaExcluir && user && firestore) {
       try {
-        await excluirMotorista(user.uid, motoristaParaExcluir.id);
+        await deleteDoc(doc(firestore, `usuarios/${user.uid}/motoristas`, motoristaParaExcluir.id));
         toast({
           title: 'Sucesso!',
           description: 'Motorista excluído.',

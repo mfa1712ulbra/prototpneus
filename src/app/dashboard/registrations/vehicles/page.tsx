@@ -44,10 +44,9 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
-import { collection, query } from 'firebase/firestore';
+import { collection, query, addDoc, doc, setDoc, writeBatch, deleteDoc } from 'firebase/firestore';
 import type { Veiculo } from '@/lib/defs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { criarVeiculo, excluirVeiculo } from '@/lib/acoes/veiculosAcoes';
 
 const schemaFormulario = z.object({
   placa: z
@@ -59,6 +58,12 @@ const schemaFormulario = z.object({
     required_error: 'Selecione o modelo do veículo.',
   }),
 });
+
+const posicoesParaModelo: Record<string, number> = {
+    '4x2': 4,
+    '6x2': 6,
+    '6x4': 10,
+}
 
 export default function PaginaCadastroVeiculo() {
   const { toast } = useToast();
@@ -84,7 +89,7 @@ export default function PaginaCadastroVeiculo() {
   });
 
   async function aoSubmeter(valores: z.infer<typeof schemaFormulario>) {
-    if (!user) {
+    if (!user || !firestore) {
       toast({
         variant: 'destructive',
         title: 'Erro',
@@ -94,7 +99,31 @@ export default function PaginaCadastroVeiculo() {
     }
 
     try {
-      await criarVeiculo(user.uid, valores);
+      const veiculosCollectionRef = collection(firestore, `usuarios/${user.uid}/veiculos`);
+      const veiculoDocRef = doc(veiculosCollectionRef); // Gera um ID
+      
+      // Cria o veículo principal
+      await setDoc(veiculoDocRef, {
+        id: veiculoDocRef.id,
+        ...valores,
+      });
+
+      // Cria a subcoleção de pneus em um batch
+      const numPneus = posicoesParaModelo[valores.modelo] || 0;
+      const batch = writeBatch(firestore);
+      for (let i = 1; i <= numPneus; i++) {
+        const pneuRef = doc(collection(veiculoDocRef, 'pneus'));
+        batch.set(pneuRef, {
+            id: pneuRef.id,
+            posicao: i.toString(),
+            pressao: 0,
+            profundidade: 0,
+            observacoes: '',
+            ultimaChecagem: null
+        });
+      }
+      await batch.commit();
+
       toast({
         title: 'Sucesso!',
         description: 'Veículo cadastrado com sucesso.',
@@ -111,9 +140,9 @@ export default function PaginaCadastroVeiculo() {
   }
 
   async function handleExcluirVeiculo() {
-    if (veiculoParaExcluir && user) {
+    if (veiculoParaExcluir && user && firestore) {
       try {
-        await excluirVeiculo(user.uid, veiculoParaExcluir.id);
+        await deleteDoc(doc(firestore, `usuarios/${user.uid}/veiculos`, veiculoParaExcluir.id));
         toast({
           title: 'Sucesso!',
           description: 'Veículo excluído.',

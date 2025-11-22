@@ -37,10 +37,9 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
-import { collection, query } from 'firebase/firestore';
+import { collection, query, addDoc, doc, deleteDoc } from 'firebase/firestore';
 import type { TipoPneu } from '@/lib/defs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { criarTipoPneu, excluirTipoPneu } from '@/lib/acoes/tiposPneuAcoes';
 
 const schemaFormulario = z.object({
   marca: z.string().min(2, 'A marca é obrigatória.'),
@@ -69,7 +68,7 @@ export default function PaginaCadastroTipoPneu() {
   });
 
   async function aoSubmeter(valores: z.infer<typeof schemaFormulario>) {
-     if (!user) {
+     if (!user || !firestore) {
       toast({
         variant: 'destructive',
         title: 'Erro',
@@ -79,7 +78,8 @@ export default function PaginaCadastroTipoPneu() {
     }
 
     try {
-      await criarTipoPneu(user.uid, valores);
+      const tiposPneuCollectionRef = collection(firestore, `usuarios/${user.uid}/tiposPneu`);
+      await addDoc(tiposPneuCollectionRef, valores);
       toast({
         title: 'Sucesso!',
         description: 'Tipo de pneu cadastrado com sucesso.',
@@ -95,9 +95,9 @@ export default function PaginaCadastroTipoPneu() {
   }
 
   async function handleExcluirTipoPneu() {
-    if (tipoPneuParaExcluir && user) {
+    if (tipoPneuParaExcluir && user && firestore) {
        try {
-        await excluirTipoPneu(user.uid, tipoPneuParaExcluir.id);
+        await deleteDoc(doc(firestore, `usuarios/${user.uid}/tiposPneu`, tipoPneuParaExcluir.id));
         toast({
           title: 'Sucesso!',
           description: 'Tipo de pneu excluído.',
