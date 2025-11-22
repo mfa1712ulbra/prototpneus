@@ -85,7 +85,7 @@ export function DialogoInfoPneu({
   }
 
   const ultimaChecagemFormatada = pneu.ultimaChecagem
-    ? format(new Date(pneu.ultimaChecagem), 'dd/MM/yyyy')
+    ? format(new Date(pneu.ultimaChecagem.seconds * 1000), 'dd/MM/yyyy')
     : 'Nunca';
 
   return (
