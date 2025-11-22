@@ -44,7 +44,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
-import { collection, query, addDoc, doc, setDoc, writeBatch, deleteDoc, updateDoc } from 'firebase/firestore';
+import { collection, query, doc, setDoc, writeBatch, deleteDoc, updateDoc } from 'firebase/firestore';
 import type { Veiculo, Motorista } from '@/lib/defs';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -120,6 +120,11 @@ export default function PaginaCadastroVeiculo() {
       return;
     }
 
+    const dadosParaSalvar = {
+      ...valores,
+      motoristaId: valores.motoristaId || null, // Garante que será null se for undefined ou ''
+    };
+
     try {
       if (veiculoParaEditar) {
         // Lógica de atualização
@@ -132,7 +137,7 @@ export default function PaginaCadastroVeiculo() {
           return;
         }
         const veiculoDocRef = doc(firestore, `usuarios/${user.uid}/veiculos`, veiculoParaEditar.id);
-        await updateDoc(veiculoDocRef, valores);
+        await updateDoc(veiculoDocRef, dadosParaSalvar);
         toast({
           title: 'Sucesso!',
           description: 'Veículo atualizado com sucesso.',
@@ -145,7 +150,7 @@ export default function PaginaCadastroVeiculo() {
         
         await setDoc(veiculoDocRef, {
           id: veiculoDocRef.id,
-          ...valores,
+          ...dadosParaSalvar,
         });
 
         const numPneus = posicoesParaModelo[valores.modelo] || 0;
@@ -185,6 +190,7 @@ export default function PaginaCadastroVeiculo() {
 
   const handleCancelarEdicao = () => {
     setVeiculoParaEditar(null);
+    form.reset({ placa: '', marca: '', modelo: undefined, motoristaId: undefined });
   };
 
 
@@ -289,7 +295,8 @@ export default function PaginaCadastroVeiculo() {
                     <FormLabel>Motorista</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      value={field.value || ''}
+                      value={field.value}
+                      defaultValue={undefined}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -301,7 +308,6 @@ export default function PaginaCadastroVeiculo() {
                            <SelectItem value="loading" disabled>Carregando...</SelectItem>
                          ) : (
                           <>
-                           <SelectItem value="">Nenhum</SelectItem>
                            {listaMotoristas?.map((motorista) => (
                             <SelectItem key={motorista.id} value={motorista.id}>
                               {motorista.nome}
