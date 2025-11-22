@@ -1,17 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { useParams, notFound } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { DiagramaVeiculo } from '@/components/vehicle-diagram';
 import { useDoc, useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
 import { doc, collection, query, updateDoc, serverTimestamp } from 'firebase/firestore';
 import type { Veiculo, Pneu } from '@/lib/defs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import { AlertCircle } from 'lucide-react';
 
 export default function PaginaDetalheVeiculo() {
   const params = useParams();
-  const { id } = params;
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const { user } = useUser();
   const firestore = useFirestore();
   const { toast } = useToast();
@@ -41,7 +42,13 @@ export default function PaginaDetalheVeiculo() {
   }
 
   if (!veiculo) {
-    notFound();
+     return (
+      <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-full py-10">
+        <AlertCircle className="h-12 w-12 mb-4" />
+        <h2 className="text-xl font-semibold">Veículo não encontrado</h2>
+        <p>O veículo que você está procurando não existe ou foi removido.</p>
+      </div>
+    );
   }
 
   const handleSalvarPneu = async (pneuAtualizado: Pneu) => {
