@@ -52,6 +52,10 @@
         "marca": {
           "type": "string",
           "description": "Marca do veículo."
+        },
+        "motoristaId": {
+          "type": "string",
+          "description": "Referência para o Motorista."
         }
       },
       "required": [

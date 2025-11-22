@@ -15,6 +15,7 @@ export type Veiculo = {
   placa: string;
   modelo: string;
   marca: string;
+  motoristaId?: string;
   // A lista de pneus agora é uma subcoleção e será carregada separadamente
 };
 

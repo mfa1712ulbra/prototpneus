@@ -45,7 +45,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
 import { collection, query, addDoc, doc, setDoc, writeBatch, deleteDoc } from 'firebase/firestore';
-import type { Veiculo } from '@/lib/defs';
+import type { Veiculo, Motorista } from '@/lib/defs';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const schemaFormulario = z.object({
@@ -57,6 +57,7 @@ const schemaFormulario = z.object({
   modelo: z.string({
     required_error: 'Selecione o modelo do veículo.',
   }),
+  motoristaId: z.string().optional(),
 });
 
 const posicoesParaModelo: Record<string, number> = {
@@ -77,7 +78,13 @@ export default function PaginaCadastroVeiculo() {
     [user, firestore]
   );
   
-  const { data: listaDeVeiculos, isLoading } = useCollection<Veiculo>(veiculosQuery);
+  const { data: listaDeVeiculos, isLoading: isLoadingVeiculos } = useCollection<Veiculo>(veiculosQuery);
+
+  const motoristasQuery = useMemoFirebase(
+    () => (user ? query(collection(firestore, `usuarios/${user.uid}/motoristas`)) : null),
+    [user, firestore]
+  );
+  const { data: listaMotoristas, isLoading: isLoadingMotoristas } = useCollection<Motorista>(motoristasQuery);
 
   const form = useForm<z.infer<typeof schemaFormulario>>({
     resolver: zodResolver(schemaFormulario),
@@ -85,6 +92,7 @@ export default function PaginaCadastroVeiculo() {
       placa: '',
       marca: '',
       modelo: undefined,
+      motoristaId: undefined,
     },
   });
 
@@ -128,7 +136,7 @@ export default function PaginaCadastroVeiculo() {
         title: 'Sucesso!',
         description: 'Veículo cadastrado com sucesso.',
       });
-      form.reset({ placa: '', marca: '', modelo: undefined });
+      form.reset({ placa: '', marca: '', modelo: undefined, motoristaId: undefined });
     } catch (error) {
       console.error("Erro ao criar veículo: ", error);
       toast({
@@ -157,6 +165,14 @@ export default function PaginaCadastroVeiculo() {
       }
     }
   }
+
+  const getNomeMotorista = (motoristaId?: string) => {
+    if (!motoristaId || !listaMotoristas) return 'N/A';
+    const motorista = listaMotoristas.find(m => m.id === motoristaId);
+    return motorista ? motorista.nome : 'N/A';
+  }
+
+  const isLoading = isLoadingVeiculos || isLoadingMotoristas;
 
   return (
     <div className="space-y-3">
@@ -222,6 +238,38 @@ export default function PaginaCadastroVeiculo() {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="motoristaId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Motorista</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      defaultValue=""
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione um motorista" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                         {isLoadingMotoristas ? (
+                           <SelectItem value="loading" disabled>Carregando...</SelectItem>
+                         ) : (
+                           listaMotoristas?.map((motorista) => (
+                            <SelectItem key={motorista.id} value={motorista.id}>
+                              {motorista.nome}
+                            </SelectItem>
+                          ))
+                         )}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <Button type="submit">
                 <Save className="mr-2 h-4 w-4" />
                 Salvar Veículo
@@ -246,13 +294,14 @@ export default function PaginaCadastroVeiculo() {
                   <TableHead>Marca</TableHead>
                   <TableHead>Placa</TableHead>
                   <TableHead>Modelo</TableHead>
+                  <TableHead>Motorista</TableHead>
                   <TableHead className="w-[120px] text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading && (
                    <TableRow>
-                      <TableCell colSpan={4}>
+                      <TableCell colSpan={5}>
                         <Skeleton className="h-8 w-full" />
                       </TableCell>
                    </TableRow>
@@ -264,6 +313,7 @@ export default function PaginaCadastroVeiculo() {
                     </TableCell>
                     <TableCell>{veiculo.placa}</TableCell>
                     <TableCell>{veiculo.modelo}</TableCell>
+                    <TableCell>{getNomeMotorista(veiculo.motoristaId)}</TableCell>
                     <TableCell className="text-right">
                       <Button
                         variant="ghost"
@@ -313,7 +363,7 @@ export default function PaginaCadastroVeiculo() {
                 ))}
                  {!isLoading && (!listaDeVeiculos || listaDeVeiculos.length === 0) && (
                     <TableRow>
-                        <TableCell colSpan={4} className="text-center">Nenhum veículo cadastrado.</TableCell>
+                        <TableCell colSpan={5} className="text-center">Nenhum veículo cadastrado.</TableCell>
                     </TableRow>
                 )}
               </TableBody>
