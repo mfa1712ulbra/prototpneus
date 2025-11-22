@@ -46,7 +46,7 @@ const posicoesPneus: Record<string, Record<string, string>> = {
 const getCorStatusPneu = (profundidade: number) => {
   if (profundidade > 6)
     return 'bg-green-200 border-green-400 text-green-800 hover:bg-green-300';
-  if (profundidade > 4)
+  if (profundidade > 3)
     return 'bg-yellow-200 border-yellow-400 text-yellow-800 hover:bg-yellow-300';
   return 'bg-red-200 border-red-400 text-red-800 hover:bg-red-300';
 };
