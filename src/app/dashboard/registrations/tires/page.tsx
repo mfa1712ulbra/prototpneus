@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -16,7 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Save, Cog, Pencil, Trash2 } from 'lucide-react';
+import { Save, Cog, Pencil, Trash2, X } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -37,7 +37,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
-import { collection, query, addDoc, doc, deleteDoc } from 'firebase/firestore';
+import { collection, query, addDoc, doc, deleteDoc, updateDoc, setDoc } from 'firebase/firestore';
 import type { TipoPneu } from '@/lib/defs';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -51,6 +51,7 @@ export default function PaginaCadastroTipoPneu() {
   const { user } = useUser();
   const firestore = useFirestore();
   const [tipoPneuParaExcluir, setTipoPneuParaExcluir] = useState<TipoPneu | any | null>(null);
+  const [tipoPneuParaEditar, setTipoPneuParaEditar] = useState<TipoPneu | null>(null);
 
   const tiposPneuQuery = useMemoFirebase(
     () => (user ? query(collection(firestore, `usuarios/${user.uid}/tiposPneu`)) : null),
@@ -67,23 +68,42 @@ export default function PaginaCadastroTipoPneu() {
     },
   });
 
+  useEffect(() => {
+    if (tipoPneuParaEditar) {
+      form.reset(tipoPneuParaEditar);
+    } else {
+      form.reset({ marca: '', modelo: '' });
+    }
+  }, [tipoPneuParaEditar, form]);
+
   async function aoSubmeter(valores: z.infer<typeof schemaFormulario>) {
      if (!user || !firestore) {
       toast({
         variant: 'destructive',
         title: 'Erro',
-        description: 'Você precisa estar logado para cadastrar um tipo de pneu.',
+        description: 'Você precisa estar logado para gerenciar tipos de pneu.',
       });
       return;
     }
 
     try {
-      const tiposPneuCollectionRef = collection(firestore, `usuarios/${user.uid}/tiposPneu`);
-      await addDoc(tiposPneuCollectionRef, valores);
-      toast({
-        title: 'Sucesso!',
-        description: 'Tipo de pneu cadastrado com sucesso.',
-      });
+      if(tipoPneuParaEditar) {
+        const tipoPneuDocRef = doc(firestore, `usuarios/${user.uid}/tiposPneu`, tipoPneuParaEditar.id);
+        await updateDoc(tipoPneuDocRef, valores);
+        toast({
+          title: 'Sucesso!',
+          description: 'Tipo de pneu atualizado com sucesso.',
+        });
+        setTipoPneuParaEditar(null);
+      } else {
+        const tiposPneuCollectionRef = collection(firestore, `usuarios/${user.uid}/tiposPneu`);
+        const newDocRef = doc(tiposPneuCollectionRef);
+        await setDoc(newDocRef, { ...valores, id: newDocRef.id });
+        toast({
+          title: 'Sucesso!',
+          description: 'Tipo de pneu cadastrado com sucesso.',
+        });
+      }
       form.reset({ marca: '', modelo: '' });
     } catch (error) {
       toast({
@@ -93,6 +113,15 @@ export default function PaginaCadastroTipoPneu() {
       });
     }
   }
+
+  const handleEditar = (tipoPneu: TipoPneu) => {
+    setTipoPneuParaEditar(tipoPneu);
+  };
+
+  const handleCancelarEdicao = () => {
+    setTipoPneuParaEditar(null);
+    form.reset({ marca: '', modelo: '' });
+  };
 
   async function handleExcluirTipoPneu() {
     if (tipoPneuParaExcluir && user && firestore) {
@@ -117,7 +146,7 @@ export default function PaginaCadastroTipoPneu() {
     <div className="space-y-3">
       <Card>
         <CardHeader className="p-4">
-          <CardTitle>Cadastrar Tipo de Pneu</CardTitle>
+          <CardTitle>{tipoPneuParaEditar ? 'Editar Tipo de Pneu' : 'Cadastrar Tipo de Pneu'}</CardTitle>
         </CardHeader>
         <CardContent className="p-4">
           <Form {...form}>
@@ -151,10 +180,18 @@ export default function PaginaCadastroTipoPneu() {
                   </FormItem>
                 )}
               />
-              <Button type="submit">
-                <Save className="mr-2 h-4 w-4" />
-                Salvar Tipo de Pneu
-              </Button>
+              <div className="flex gap-2">
+                <Button type="submit">
+                  <Save className="mr-2 h-4 w-4" />
+                  {tipoPneuParaEditar ? 'Atualizar' : 'Salvar Tipo de Pneu'}
+                </Button>
+                 {tipoPneuParaEditar && (
+                  <Button variant="outline" type="button" onClick={handleCancelarEdicao}>
+                    <X className="mr-2 h-4 w-4" />
+                    Cancelar Edição
+                  </Button>
+                )}
+              </div>
             </form>
           </Form>
         </CardContent>
@@ -194,7 +231,7 @@ export default function PaginaCadastroTipoPneu() {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => console.log('Editar', tipo.id)}
+                        onClick={() => handleEditar(tipo)}
                       >
                         <Pencil className="h-4 w-4" />
                         <span className="sr-only">Editar</span>

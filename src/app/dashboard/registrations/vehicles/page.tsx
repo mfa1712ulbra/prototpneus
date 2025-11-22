@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Save, Truck, Pencil, Trash2 } from 'lucide-react';
+import { Save, Truck, Pencil, Trash2, X } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -44,7 +44,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
-import { collection, query, addDoc, doc, setDoc, writeBatch, deleteDoc } from 'firebase/firestore';
+import { collection, query, addDoc, doc, setDoc, writeBatch, deleteDoc, updateDoc } from 'firebase/firestore';
 import type { Veiculo, Motorista } from '@/lib/defs';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -71,6 +71,7 @@ export default function PaginaCadastroVeiculo() {
   const { user } = useUser();
   const firestore = useFirestore();
   const [veiculoParaExcluir, setVeiculoParaExcluir] = useState<Veiculo | any | null>(null);
+  const [veiculoParaEditar, setVeiculoParaEditar] = useState<Veiculo | null>(null);
 
   const veiculosQuery = useMemoFirebase(
     () =>
@@ -96,56 +97,96 @@ export default function PaginaCadastroVeiculo() {
     },
   });
 
+  useEffect(() => {
+    if (veiculoParaEditar) {
+      form.reset({
+        placa: veiculoParaEditar.placa,
+        marca: veiculoParaEditar.marca,
+        modelo: veiculoParaEditar.modelo,
+        motoristaId: veiculoParaEditar.motoristaId || undefined,
+      });
+    } else {
+       form.reset({ placa: '', marca: '', modelo: undefined, motoristaId: undefined });
+    }
+  }, [veiculoParaEditar, form]);
+
   async function aoSubmeter(valores: z.infer<typeof schemaFormulario>) {
     if (!user || !firestore) {
       toast({
         variant: 'destructive',
         title: 'Erro',
-        description: 'Você precisa estar logado para cadastrar um veículo.',
+        description: 'Você precisa estar logado para gerenciar veículos.',
       });
       return;
     }
 
     try {
-      const veiculosCollectionRef = collection(firestore, `usuarios/${user.uid}/veiculos`);
-      const veiculoDocRef = doc(veiculosCollectionRef); // Gera um ID
-      
-      // Cria o veículo principal
-      await setDoc(veiculoDocRef, {
-        id: veiculoDocRef.id,
-        ...valores,
-      });
+      if (veiculoParaEditar) {
+        // Lógica de atualização
+        if (valores.modelo !== veiculoParaEditar.modelo) {
+           toast({
+            variant: 'destructive',
+            title: 'Atenção',
+            description: 'A alteração do modelo de um veículo não é permitida para não afetar o diagrama de pneus. Exclua e cadastre novamente.',
+          });
+          return;
+        }
+        const veiculoDocRef = doc(firestore, `usuarios/${user.uid}/veiculos`, veiculoParaEditar.id);
+        await updateDoc(veiculoDocRef, valores);
+        toast({
+          title: 'Sucesso!',
+          description: 'Veículo atualizado com sucesso.',
+        });
+        setVeiculoParaEditar(null);
+      } else {
+        // Lógica de criação
+        const veiculosCollectionRef = collection(firestore, `usuarios/${user.uid}/veiculos`);
+        const veiculoDocRef = doc(veiculosCollectionRef);
+        
+        await setDoc(veiculoDocRef, {
+          id: veiculoDocRef.id,
+          ...valores,
+        });
 
-      // Cria a subcoleção de pneus em um batch
-      const numPneus = posicoesParaModelo[valores.modelo] || 0;
-      const batch = writeBatch(firestore);
-      for (let i = 1; i <= numPneus; i++) {
-        const pneuRef = doc(collection(veiculoDocRef, 'pneus'));
-        batch.set(pneuRef, {
-            id: pneuRef.id,
-            posicao: i.toString(),
-            pressao: 0,
-            profundidade: 0,
-            observacoes: '',
-            ultimaChecagem: null
+        const numPneus = posicoesParaModelo[valores.modelo] || 0;
+        const batch = writeBatch(firestore);
+        for (let i = 1; i <= numPneus; i++) {
+          const pneuRef = doc(collection(veiculoDocRef, 'pneus'));
+          batch.set(pneuRef, {
+              id: pneuRef.id,
+              posicao: i.toString(),
+              pressao: 0,
+              profundidade: 0,
+              observacoes: '',
+              ultimaChecagem: null
+          });
+        }
+        await batch.commit();
+
+        toast({
+          title: 'Sucesso!',
+          description: 'Veículo cadastrado com sucesso.',
         });
       }
-      await batch.commit();
-
-      toast({
-        title: 'Sucesso!',
-        description: 'Veículo cadastrado com sucesso.',
-      });
       form.reset({ placa: '', marca: '', modelo: undefined, motoristaId: undefined });
     } catch (error) {
-      console.error("Erro ao criar veículo: ", error);
+      console.error("Erro ao salvar veículo: ", error);
       toast({
         variant: 'destructive',
-        title: 'Erro ao cadastrar',
+        title: 'Erro ao salvar',
         description: 'Não foi possível salvar o veículo. Tente novamente.',
       });
     }
   }
+
+  const handleEditar = (veiculo: Veiculo) => {
+    setVeiculoParaEditar(veiculo);
+  };
+
+  const handleCancelarEdicao = () => {
+    setVeiculoParaEditar(null);
+  };
+
 
   async function handleExcluirVeiculo() {
     if (veiculoParaExcluir && user && firestore) {
@@ -178,7 +219,7 @@ export default function PaginaCadastroVeiculo() {
     <div className="space-y-3">
       <Card>
         <CardHeader className="p-4">
-          <CardTitle>Cadastrar Novo Veículo</CardTitle>
+          <CardTitle>{veiculoParaEditar ? 'Editar Veículo' : 'Cadastrar Novo Veículo'}</CardTitle>
         </CardHeader>
         <CardContent className="p-4">
           <Form {...form}>
@@ -222,6 +263,7 @@ export default function PaginaCadastroVeiculo() {
                       onValueChange={field.onChange}
                       value={field.value}
                       defaultValue=""
+                      disabled={!!veiculoParaEditar}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -234,6 +276,7 @@ export default function PaginaCadastroVeiculo() {
                         <SelectItem value="6x4">6x4</SelectItem>
                       </SelectContent>
                     </Select>
+                    {veiculoParaEditar && <p className="text-xs text-muted-foreground">O modelo não pode ser alterado na edição.</p>}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -246,8 +289,7 @@ export default function PaginaCadastroVeiculo() {
                     <FormLabel>Motorista</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      value={field.value}
-                      defaultValue=""
+                      value={field.value || ''}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -258,11 +300,14 @@ export default function PaginaCadastroVeiculo() {
                          {isLoadingMotoristas ? (
                            <SelectItem value="loading" disabled>Carregando...</SelectItem>
                          ) : (
-                           listaMotoristas?.map((motorista) => (
+                          <>
+                           <SelectItem value="">Nenhum</SelectItem>
+                           {listaMotoristas?.map((motorista) => (
                             <SelectItem key={motorista.id} value={motorista.id}>
                               {motorista.nome}
                             </SelectItem>
-                          ))
+                          ))}
+                          </>
                          )}
                       </SelectContent>
                     </Select>
@@ -270,10 +315,18 @@ export default function PaginaCadastroVeiculo() {
                   </FormItem>
                 )}
               />
-              <Button type="submit">
-                <Save className="mr-2 h-4 w-4" />
-                Salvar Veículo
-              </Button>
+               <div className="flex gap-2">
+                <Button type="submit">
+                  <Save className="mr-2 h-4 w-4" />
+                  {veiculoParaEditar ? 'Atualizar' : 'Salvar Veículo'}
+                </Button>
+                {veiculoParaEditar && (
+                  <Button variant="outline" type="button" onClick={handleCancelarEdicao}>
+                    <X className="mr-2 h-4 w-4" />
+                    Cancelar Edição
+                  </Button>
+                )}
+              </div>
             </form>
           </Form>
         </CardContent>
@@ -319,7 +372,7 @@ export default function PaginaCadastroVeiculo() {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => console.log('Editar', veiculo.id)}
+                        onClick={() => handleEditar(veiculo)}
                       >
                         <Pencil className="h-4 w-4" />
                         <span className="sr-only">Editar</span>
