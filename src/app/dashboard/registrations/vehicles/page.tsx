@@ -297,7 +297,8 @@ export default function PaginaCadastroVeiculo() {
                     <FormLabel>Motorista</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      value={field.value || ''}
+                      value={field.value}
+                      defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -309,7 +310,6 @@ export default function PaginaCadastroVeiculo() {
                            <SelectItem value="loading" disabled>Carregando...</SelectItem>
                          ) : (
                           <>
-                           <SelectItem value="">Nenhum</SelectItem>
                            {listaMotoristas?.map((motorista) => (
                             <SelectItem key={motorista.id} value={motorista.id}>
                               {motorista.nome}
