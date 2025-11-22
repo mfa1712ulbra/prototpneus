@@ -71,7 +71,7 @@ export function DialogoInfoPneu({
         profundidade: pneu.profundidade,
         observacoes: pneu.observacoes || '',
         movimentacao: 'nenhuma',
-        tipoPneuId: pneu.tipoPneuId || '',
+        tipoPneuId: pneu.tipoPneuId || undefined,
       });
     }
     setSucesso(false);
@@ -88,9 +88,10 @@ export function DialogoInfoPneu({
     }, 1500);
   }
 
-  const ultimaChecagemFormatada = pneu.ultimaChecagem
-    ? format(new Date(pneu.ultimaChecagem.seconds * 1000), 'dd/MM/yyyy')
-    : 'Nunca';
+  const ultimaChecagemFormatada =
+    pneu.ultimaChecagem && pneu.ultimaChecagem.seconds
+      ? format(new Date(pneu.ultimaChecagem.seconds * 1000), 'dd/MM/yyyy')
+      : 'Nunca';
 
   return (
     <Dialog open={estaAberto} onOpenChange={onAbrirMudar}>
@@ -161,7 +162,6 @@ export function DialogoInfoPneu({
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
-                        defaultValue=""
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -169,7 +169,6 @@ export function DialogoInfoPneu({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                           <SelectItem value="">Nenhum</SelectItem>
                            {tiposPneu.map((tipo) => (
                             <SelectItem key={tipo.id} value={tipo.id}>
                               {tipo.marca} {tipo.modelo}
