@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -72,6 +72,7 @@ export default function PaginaCadastroVeiculo() {
   const firestore = useFirestore();
   const [veiculoParaExcluir, setVeiculoParaExcluir] = useState<Veiculo | any | null>(null);
   const [veiculoParaEditar, setVeiculoParaEditar] = useState<Veiculo | null>(null);
+  const formCardRef = useRef<HTMLDivElement>(null);
 
   const veiculosQuery = useMemoFirebase(
     () =>
@@ -186,6 +187,7 @@ export default function PaginaCadastroVeiculo() {
 
   const handleEditar = (veiculo: Veiculo) => {
     setVeiculoParaEditar(veiculo);
+    formCardRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleCancelarEdicao = () => {
@@ -223,7 +225,7 @@ export default function PaginaCadastroVeiculo() {
 
   return (
     <div className="space-y-3">
-      <Card>
+      <Card ref={formCardRef}>
         <CardHeader className="p-4">
           <CardTitle>{veiculoParaEditar ? 'Editar Veículo' : 'Cadastrar Novo Veículo'}</CardTitle>
         </CardHeader>
@@ -295,8 +297,7 @@ export default function PaginaCadastroVeiculo() {
                     <FormLabel>Motorista</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      value={field.value}
-                      defaultValue={undefined}
+                      value={field.value || ''}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -308,6 +309,7 @@ export default function PaginaCadastroVeiculo() {
                            <SelectItem value="loading" disabled>Carregando...</SelectItem>
                          ) : (
                           <>
+                           <SelectItem value="">Nenhum</SelectItem>
                            {listaMotoristas?.map((motorista) => (
                             <SelectItem key={motorista.id} value={motorista.id}>
                               {motorista.nome}

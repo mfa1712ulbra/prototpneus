@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -52,6 +52,7 @@ export default function PaginaCadastroTipoPneu() {
   const firestore = useFirestore();
   const [tipoPneuParaExcluir, setTipoPneuParaExcluir] = useState<TipoPneu | any | null>(null);
   const [tipoPneuParaEditar, setTipoPneuParaEditar] = useState<TipoPneu | null>(null);
+  const formCardRef = useRef<HTMLDivElement>(null);
 
   const tiposPneuQuery = useMemoFirebase(
     () => (user ? query(collection(firestore, `usuarios/${user.uid}/tiposPneu`)) : null),
@@ -116,6 +117,7 @@ export default function PaginaCadastroTipoPneu() {
 
   const handleEditar = (tipoPneu: TipoPneu) => {
     setTipoPneuParaEditar(tipoPneu);
+    formCardRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleCancelarEdicao = () => {
@@ -144,7 +146,7 @@ export default function PaginaCadastroTipoPneu() {
 
   return (
     <div className="space-y-3">
-      <Card>
+      <Card ref={formCardRef}>
         <CardHeader className="p-4">
           <CardTitle>{tipoPneuParaEditar ? 'Editar Tipo de Pneu' : 'Cadastrar Tipo de Pneu'}</CardTitle>
         </CardHeader>

@@ -39,7 +39,7 @@ import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebas
 import { collection, query, addDoc, deleteDoc, doc, updateDoc, setDoc } from 'firebase/firestore';
 import type { Motorista } from '@/lib/defs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const schemaFormulario = z.object({
   nome: z.string().min(2, 'O nome do motorista é obrigatório.'),
@@ -57,6 +57,7 @@ export default function PaginaCadastroMotorista() {
     Motorista | any | null
   >(null);
   const [motoristaParaEditar, setMotoristaParaEditar] = useState<Motorista | null>(null);
+  const formCardRef = useRef<HTMLDivElement>(null);
 
   const motoristasQuery = useMemoFirebase(
     () => (user ? query(collection(firestore, `usuarios/${user.uid}/motoristas`)) : null),
@@ -121,6 +122,7 @@ export default function PaginaCadastroMotorista() {
   
   const handleEditar = (motorista: Motorista) => {
     setMotoristaParaEditar(motorista);
+    formCardRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleCancelarEdicao = () => {
@@ -150,7 +152,7 @@ export default function PaginaCadastroMotorista() {
 
   return (
     <div className="space-y-3">
-      <Card>
+      <Card ref={formCardRef}>
         <CardHeader className="p-4">
           <CardTitle>{motoristaParaEditar ? 'Editar Motorista' : 'Cadastrar Novo Motorista'}</CardTitle>
         </CardHeader>
