@@ -8,8 +8,10 @@
  * The data is organized hierarchically under `/usuarios/{usuarioId}`, with subcollections for vehicles, tires, and movement history:
  * - /usuarios/{usuarioId}
  * - /usuarios/{usuarioId}/veiculos/{veiculoId}
- * - /usuarios/{usuarioId}/veiculos/{veiculoId}/pneus/{pneuId}
- * - /usuarios/{usuarioId}/veiculos/{veiculoId}/pneus/{pneuId}/movimentacoes/{movimentacaoId}
+ * - /usuarios/{usuarioId}/pneus/{pneuId}
+ * - /usuarios/{usuarioId}/pneus/{pneuId}/movimentacoes/{movimentacaoId}
+ * - /usuarios/{usuarioId}/motoristas/{motoristaId}
+ * - /usuarios/{usuarioId}/tiposPneu/{tipoPneuId}
  *
  * Key Security Decisions:
  * - All data is private and accessible only to the owning user.
@@ -76,11 +78,7 @@ service cloud.firestore {
         return isOwner(userId) && resource != null;
       }
 
-      allow get: if isOwner(usuarioId);
-      allow list: if isOwner(usuarioId);
-      allow create: if isOwner(usuarioId);
-      allow update: if isExistingOwner(usuarioId);
-      allow delete: if isExistingOwner(usuarioId);
+      allow get, list, create, update, delete: if isOwner(usuarioId);
     }
 
     /**
@@ -105,11 +103,7 @@ service cloud.firestore {
         return isOwner(userId) && resource != null;
       }
 
-      allow get: if isOwner(usuarioId);
-      allow list: if isOwner(usuarioId);
-      allow create: if isOwner(usuarioId);
-      allow update: if isExistingOwner(usuarioId);
-      allow delete: if isExistingOwner(usuarioId);
+      allow get, list, create, update, delete: if isOwner(usuarioId);
     }
 
     /**
@@ -134,11 +128,33 @@ service cloud.firestore {
         return isOwner(userId) && resource != null;
       }
 
-      allow get: if isOwner(usuarioId);
-      allow list: if isOwner(usuarioId);
-      allow create: if isOwner(usuarioId);
-      allow update: if isExistingOwner(usuarioId);
-      allow delete: if isExistingOwner(usuarioId);
+      allow get, list, create, update, delete: if isOwner(usuarioId);
+    }
+
+    /**
+     * @description Controls access to driver data for a specific user.
+     * @path /usuarios/{usuarioId}/motoristas/{motoristaId}
+     * @principle Enforces document ownership; only the user can manage their own drivers.
+     */
+    match /usuarios/{usuarioId}/motoristas/{motoristaId} {
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      allow get, list, create, update, delete: if isOwner(usuarioId);
+    }
+
+    /**
+     * @description Controls access to tire type data for a specific user.
+     * @path /usuarios/{usuarioId}/tiposPneu/{tipoPneuId}
+     * @principle Enforces document ownership; only the user can manage their own tire types.
+     */
+    match /usuarios/{usuarioId}/tiposPneu/{tipoPneuId} {
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      allow get, list, create, update, delete: if isOwner(usuarioId);
     }
   }
 }
